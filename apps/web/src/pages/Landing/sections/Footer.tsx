@@ -117,8 +117,8 @@ export function Footer() {
                 <StyledInternalLink to="/tokens/ethereum">
                   <Trans>Tokens</Trans>
                 </StyledInternalLink>
-                <StyledInternalLink to="/nfts">
-                  <Trans>NFTs</Trans>
+                <StyledInternalLink to="/chatbot">
+                  <Trans>Chatbot</Trans>
                 </StyledInternalLink>
                 <StyledInternalLink to="/pool">
                   <Trans>Pool</Trans>
@@ -126,45 +126,23 @@ export function Footer() {
               </Box>
               <Box direction="column" gap="10px">
                 <Body1>
-                  <Trans>Protocol</Trans>
-                </Body1>
-                <StyledExternalLink href="https://uniswap.org/governance">
-                  <Trans>Governance</Trans>
-                </StyledExternalLink>
-                <StyledExternalLink href="https://uniswap.org/developers">
-                  <Trans>Developers</Trans>
-                </StyledExternalLink>
-              </Box>
-            </Box>
-            <Box direction="row" gap="16px">
-              <Box direction="column" gap="10px">
-                <Body1>
                   <Trans>Company</Trans>
                 </Body1>
-                <StyledExternalLink href="https://boards.greenhouse.io/uniswaplabs">
-                  <Trans>Careers</Trans>
-                </StyledExternalLink>
-                <StyledExternalLink href="https://blog.uniswap.org/">
+                <StyledExternalLink href="/blog">
                   <Trans>Blog</Trans>
                 </StyledExternalLink>
-                <DownloadLink href="https://github.com/Uniswap/brand-assets/raw/main/Uniswap%20Brand%20Assets.zip">
-                  <Trans>Brand Assets</Trans>
-                </DownloadLink>
-                <ModalItem onClick={togglePrivacyPolicy}>
-                  <Trans>Terms & Privacy</Trans>
-                </ModalItem>
-                <StyledExternalLink href="https://uniswap.org/trademark">
-                  <Trans>Trademark Policy</Trans>
+                <StyledExternalLink href="/">
+                  <Trans>Developers</Trans>
                 </StyledExternalLink>
               </Box>
               <Box direction="column" gap="10px">
                 <Body1>
                   <Trans>Need help?</Trans>
                 </Body1>
-                <StyledExternalLink href="https://support.uniswap.org/hc/en-us/requests/new">
+                <StyledExternalLink href="/">
                   <Trans>Contact us</Trans>
                 </StyledExternalLink>
-                <StyledExternalLink href="https://support.uniswap.org/hc/en-us">
+                <StyledExternalLink href="/">
                   <Trans>Help Center</Trans>
                 </StyledExternalLink>
               </Box>
