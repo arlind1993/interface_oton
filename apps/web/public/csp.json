@@ -131,7 +131,10 @@
     "wss://relay.walletconnect.com",
     "wss://relay.walletconnect.org",
     "wss://www.walletlink.org",
-    "wss://ws-us3.pusher.com/"
+    "wss://ws-us3.pusher.com/",
+    "ws://localhost:4000",
+    "wss://95.217.163.249:3000",
+    "wss://oton.ai:3000"
   ],
   "workerSrc": [
     "'self'",
