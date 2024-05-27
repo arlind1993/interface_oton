@@ -18,11 +18,13 @@ import signatures from './signatures/reducer'
 import transactions from './transactions/reducer'
 import user from './user/reducer'
 import wallets from './wallets/reducer'
+import chatbot from './chatbot/reducer'
 
 const persistedReducers = {
   user,
   transactions,
   signatures,
+  chatbot,
   lists,
 }
 

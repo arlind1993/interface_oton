@@ -9,23 +9,12 @@ import { InputContainer, Input } from 'components/Settings/Input';
 import { ResizingTextArea } from 'components/TextInput';
 import { scrollbarStyle } from '../../components/SearchModal/CurrencyList/index.css';
 import {Botkit} from "botkit";
+import { ChatItem, updateChatItem } from 'state/chatbot/reducer';
+import { useAppDispatch, useAppSelector } from 'state/hooks';
+import ChatInput from './ChatInput';
+import Row from 'components/Row';
 
-interface ChatItem {
-    id: number;
-    text: string;
-    tempText: string;
-    type: string;
-    isChatbotText: boolean;
-    hover: boolean;
-    editing: boolean;
-    options?: OptionsItem[];
-}
-  
-interface OptionsItem {
-    id: number;
-    text: string;
-    href: string;
-}
+
 
 styled.input<{ isOpen?: boolean }>`
 //   background: no-repeat scroll 7px 7px;
@@ -69,6 +58,8 @@ styled.input<{ isOpen?: boolean }>`
 // `
 
 const Section = styled.div`
+  display: flex;
+  flex-direction: column;
   flex: 1;
   justify-content: center;
 `
@@ -91,6 +82,8 @@ const ChatList = styled.div`
   display: flex;
   flex-direction: column;
   width: clamp(400px, 100%, 600px);
+  max-height: calc(100vh - 72px - 80px - 10px - 150px);
+  overflow-y: auto;
   background: ${({theme} )=> theme.surface3};
 `;
 
@@ -156,101 +149,20 @@ const ButtonActionSecondary = styled(ButtonSecondary)`
 // const controller = new Botkit();
 
 function Chatbot() {
+  const dispatch = useAppDispatch();
+  const chats = useAppSelector((state) => state.chatbot.chats);
+  console.log(chats);
   const refs = useRef<Array<HTMLTextAreaElement | null>>([]);
-  const [data, setData] = useState<ChatItem[]>([
-    {
-      id: 1,
-      text: "Hello, how can I help you ",
-      tempText: "",
-      isChatbotText: true,
-      type: "text",
-      hover: false,
-      editing: false,
-    },
-    {
-      id: 2,
-      text: "I'd like to know ....",
-      tempText: "",
-      type: "text",
-      isChatbotText: false,
-      hover: false,
-      editing: false,
-    },
-    {
-      id: 3,
-      text: "Hi i can help you with that",
-      tempText: "",
-      type: "options",
-      options: [
-        {id: 1, text: "Go to main", href: "/"},
-        {id: 2, text: "Go to explore", href: "/explore"},
-      ],
-      isChatbotText: true,
-      hover: false,
-      editing: false,
-    },
-    {
-      id: 4,
-      text: "4",
-      tempText: "",
-      isChatbotText: true,
-      hover: false,
-      type: "text",
-      editing: false,
-    },
-  ]);
-
-
-  const handleItemAction = useCallback((
-    item: ChatItem, 
-    pos?: number,
-    hover?: boolean,
-    editing?: boolean,
-    text?: string,
-    tempText?: string,
-    ) => {
-      const dcp = [...data];
-      const index = pos ?? dcp.indexOf(item);
-      if(index >= 0){
-        if(hover != undefined && hover != null){
-          item.hover = hover;
-        }
-        if(editing != undefined && editing != null){
-          item.editing = editing;
-          if(editing){
-            item.tempText = item.text;
-            setTimeout(()=>{
-              if(refs.current[index]){
-                refs.current[index]?.focus();
-              }
-            });
-          }else{
-            console.log(item);
-            item.tempText = "";
-          }
-          if(refs.current[index]){
-            refs.current[index]!.innerHTML = item.text;
-          }
-        }
-        if(text != undefined && text != null){
-          item.text = text;
-        }
-        if(tempText != undefined && tempText != null){
-          item.tempText = tempText;
-        }
-        dcp[index] = item;
-        setData(dcp);
-      }
-  }, []);
-
+  const histories = useAppSelector((state) => state.chatbot.histories);
+  console.log(histories);
 
   const renderItem = useCallback((item: ChatItem, pos: number) => {
-    const handleMouseEnter = () => handleItemAction(item, pos, true);
-    const handleMouseLeave = () => handleItemAction(item, pos, false);
-    const handleOnChange = (e: string)=> handleItemAction(item, pos, undefined, undefined, undefined, e);
-    const handleEdit = () => handleItemAction(item, pos, undefined, true);
-    const handleSubmit = () => handleItemAction(item, pos, undefined, false, item.tempText);
-    const handleCancel = () => handleItemAction(item, pos, undefined, false);
+    const handleMouseEnter = () => dispatch(updateChatItem({refs, pos, hover: true}));
+    const handleMouseLeave = () => dispatch(updateChatItem({refs, pos, hover: false}));
+    const handleOnChange = (e: string)=> dispatch(updateChatItem({refs, pos, tempText: e}));
+    const handleEdit = () => dispatch(updateChatItem({refs, pos, editing: true, tempText: item.editing ? item.tempText : undefined}));
+    const handleSubmit = () => dispatch(updateChatItem({refs, pos, editing: false, text: item.tempText}));
+    const handleCancel = () => dispatch(updateChatItem({refs, pos, editing: false}));
     const handleCopy = () => navigator.clipboard.writeText(item.text);
     const handleKeyPresses = (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if(e.key === 'Enter' && !e.shiftKey){
@@ -327,48 +239,18 @@ function Chatbot() {
         
       </Chatbox>
     );
-  }, [handleItemAction,]);
+  }, [chats]);
 
   
 
   return (
     <Section>
-      <ChatList>
-        {data.map((item, index)=> renderItem(item, index))}
+      <ChatList className={`${scrollbarStyle}`}>
+        {chats.map((item, index)=> renderItem(item, index))}
       </ChatList>
-      <ChatInput onSubmit={(message: string)=>{
-        console.log();
-      }}/>
+      <ChatInput/>
     </Section>
   );
 }
 
-function ChatInput({onSubmit}:{onSubmit: (message: string)=>void}){
-
-  const inputRef = useRef<HTMLTextAreaElement | null>(null);
-  const [input, setInput] = useState<string>("");
-  
-  return (
-    <ChatInputContainer>
-      <Description enabled={true}>
-        <InputField 
-          ref={(e)=>inputRef.current = e}
-          fontSize='16'
-          placeholder=''
-          className={`${scrollbarStyle}`}
-          onUserInput={(e)=> setInput(e)}
-          onKeyDown={(e)=>{
-            if(e.key === 'Enter' && !e.shiftKey){
-              e.preventDefault();
-              onSubmit(input);
-            }
-          }}
-          value={input} 
-        />
-      </Description>
-    </ChatInputContainer>
-  );
-}
-
-
-export default memo(Chatbot)
+export default memo(Chatbot);

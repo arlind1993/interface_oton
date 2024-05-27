@@ -28,6 +28,7 @@ import { UserState } from './user/reducer'
 import { SerializedPair, SerializedToken, SlippageTolerance } from './user/types'
 import { WalletState } from './wallets/reducer'
 import { Wallet } from './wallets/types'
+import { ChatbotState } from './chatbot/reducer'
 
 /**
  * WARNING:
@@ -59,6 +60,7 @@ type ExpectedAppState = CombinedState<{
   mintV3: MintV3State
   burn: BurnState
   burnV3: BurnV3State
+  chatbot: ChatbotState
   multicall: ReturnType<typeof multicall.reducer>
   logs: LogsState
   [routingApi.reducerPath]: ReturnType<typeof routingApi.reducer>

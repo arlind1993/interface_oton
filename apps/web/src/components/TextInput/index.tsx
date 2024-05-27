@@ -137,6 +137,7 @@ export const ResizingTextArea = memo(
     return (
       <TextAreaInput
         disabled = {disable}
+        rows={1}
         style={style}
         className={className}
         autoComplete="off"

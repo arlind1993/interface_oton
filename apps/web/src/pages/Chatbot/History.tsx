@@ -8,12 +8,17 @@ import moment, { months } from 'moment';
 import { Edit, Trash } from 'ui/src/components/icons';
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
 import { InputContainer, Input } from 'components/Settings/Input';
+import { addHistoryItem, emptyChats, HistoryItem, removeHistoryItem, updateHistoryItem } from 'state/chatbot/reducer';
+import { useAppDispatch, useAppSelector } from 'state/hooks';
+import { v4 as uuid } from 'uuid';
+import { scrollbarStyle } from 'components/SearchModal/CurrencyList/index.css';
+import Row from 'components/Row';
 
 
 const Section = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   padding: 5px;
   background: ${({ theme }) => theme.surface1};
 `
@@ -26,7 +31,8 @@ const HistoryButton = styled(ThemeButton)`
   line-height: 12px;
   padding: 10px;
   border-radius: 10px;
-  position: relative
+  position: relative;
+
 `;
 
 const SideButton = styled(ThemeButton)`
@@ -48,6 +54,14 @@ const TimeInput = styled.span`
   right: 0;
 `;
 
+const HistoryContainer = styled.div`
+    max-height: calc(100vh - 72px - 80px - 76px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+`;
+
 const TitleContainer = styled(InputContainer) <{
   enabled: boolean
 }>`
@@ -58,14 +72,7 @@ const TitleContainer = styled(InputContainer) <{
 `;
 
 
-interface HistoryItem {
-  id: string;
-  name: string;
-  tempName: string;
-  timestamp: number;
-  hover: boolean;
-  renaming: boolean;
-}
+
 
 export function timeAgo(inputTime: number) {// inputtime with ms
   const timeThen = moment.unix(inputTime / 1000);
@@ -102,111 +109,36 @@ function Chatbot() {
   const refs = useRef<Array<HTMLInputElement | null>>([]);
 
   const navigation = useNavigate();
-  const [data, setData] = useState<HistoryItem[]>([
-    {
-      id: "2",
-      name: "d",
-      tempName: "",
-      timestamp: 1715076642000,
-      hover: false,
-      renaming: false,
-    },
-    {
-      id: "1",
-      name: "",
-      tempName: "",
-      timestamp: 1714990242000,
-      hover: false,
-      renaming: false,
-    },
-    {
-      id: "5",
-      name: "3",
-      tempName: "",
-      timestamp: 1713607842000,
-      hover: false,
-      renaming: false,
-    },
-    {
-      id: "23",
-      name: "432332",
-      tempName: "",
-      timestamp: 1716199842000,
-      hover: false,
-      renaming: false,
-    },
-  ]);
 
-
-
+  const histories = useAppSelector((state) => state.chatbot.histories);
+  const dispatch = useAppDispatch();
   const {chatId} = useParams<{ chatId: string;}>();
-  console.log("ChatId: " + chatId);
 
   const handlePress = useCallback((item?: HistoryItem) => {
-    console.log('Item pressed:', item);
-    navigation(`/chatbot${item ? "/" + item.id :""}`);
-  }, []);
-
-  const handleRemoveItem = useCallback((item: HistoryItem, pos: number) => {
-    if(item.id == chatId){
-    handlePress();
-    }
-    console.log(item.id+ "------0-" +chatId);
-    setData((data) => data.filter((item, index) => index !== pos));
-    refs.current = refs.current.filter((_, index) => index !== pos);
+    if(item){
+      navigation("/chatbot/"+ item.id);
+    }else{
+      navigation("/chatbot");
+      if(chatId != null && chatId != undefined){
+        dispatch(emptyChats());
+      }
       
+    }
+
+    
   }, [chatId]);
 
-  const handleItemAction = useCallback((
-    item: HistoryItem,
-    pos?: number,
-    hover?: boolean,
-    renaming?: boolean,
-    name?: string,
-    tempName?: string,
-  ) => {
-    const dcp = [...data];
-    const index = pos ?? dcp.indexOf(item);
-    if (index >= 0) {
-      if (hover != undefined && hover != null) {
-        item.hover = hover;
-      }
-      if (renaming != undefined && renaming != null) {
-        item.renaming = renaming;
-        if (renaming) {
-          item.tempName = item.name;
-          setTimeout(() => {
-            if (refs.current[index]) {
-              refs.current[index]?.focus();
-            }
-          });
-        } else {
-          console.log(item);
-          item.tempName = "";
-        }
-        if (refs.current[index]) {
-          refs.current[index]!.innerHTML = item.name;
-        }
-      }
-      if (name != undefined && name != null) {
-        item.name = name;
-      }
-      if (tempName != undefined && tempName != null) {
-        item.tempName = tempName;
-      }
-      dcp[index] = item;
-      setData(dcp);
-    }
-  }, [handleRemoveItem, data]);
-
-
   const renderItem = useCallback((item: HistoryItem, pos: number) => {
-    const handleMouseEnter = () => handleItemAction(item, pos, true);
-    const handleMouseLeave = () => handleItemAction(item, pos, false);
-    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => handleItemAction(item, pos, undefined, undefined, undefined, e.target.value);
-    const handleEdit = () => handleItemAction(item, pos, undefined, true, undefined, item.renaming ? item.tempName : undefined);
-    const handleSubmit = () => handleItemAction(item, pos, undefined, false, item.tempName);
-    const handleCancel = () => handleItemAction(item, pos, undefined, false);
+    const handleMouseEnter = () => dispatch(updateHistoryItem({refs, pos, hover: true}));
+    const handleMouseLeave = () => dispatch(updateHistoryItem({refs, pos, hover: false}));
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => dispatch(updateHistoryItem({refs, pos, tempName: e.target.value}));
+    const handleEdit = () => dispatch(updateHistoryItem({refs, pos, renaming: true, tempName: item.renaming ? item.tempName : undefined}));
+    const handleSubmit = () => {
+      dispatch(updateHistoryItem({refs, pos, renaming: false, name: item.tempName}));
+    }
+    const handleCancel = () => dispatch(updateHistoryItem({refs, pos, renaming: false}));
+    const removeItem = () => dispatch(removeHistoryItem({refs, pos}));
+    
     const handleKeyPresses = (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         handleSubmit();
@@ -251,7 +183,7 @@ function Chatbot() {
           </TitleContainer>
         </SideButton>
         {(item.id == chatId || item.hover) &&
-          <div style={{ display: 'flex' }}>
+          <Row>
             <MouseoverTooltip text="Rename" placement='bottom' size={TooltipSize.Auto}>
               <SideButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium}
                 onClickCapture={(e)=>{
@@ -263,16 +195,16 @@ function Chatbot() {
             </MouseoverTooltip>
             <MouseoverTooltip text="Delete" placement='bottom' size={TooltipSize.Auto}>
               <SideButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium}
-                onClick={() => handleRemoveItem(item, pos)}>
+                onClick={removeItem}>
                 <Trash style={{ width: 12, height: 12 }} />
               </SideButton>
             </MouseoverTooltip>
-          </div>
+          </Row>
         }
         <TimeInput>{timeAgo(item.timestamp)}</TimeInput>
       </HistoryButton>
     );
-  }, [handleItemAction, handleRemoveItem, handlePress, chatId]);
+  }, [histories, chatId]);
 
 
   return (
@@ -287,7 +219,10 @@ function Chatbot() {
       <SideText>
         My History
       </SideText>
-      {data.map((item, pos) => renderItem(item, pos))}
+      <HistoryContainer className={`${scrollbarStyle}`}>
+        {histories.map((item, pos) => renderItem(item, pos))}
+      </HistoryContainer>
+      
     </Section>
   )
 }
