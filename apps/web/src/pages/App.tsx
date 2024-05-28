@@ -7,7 +7,7 @@ import { UK_BANNER_HEIGHT, UK_BANNER_HEIGHT_MD, UK_BANNER_HEIGHT_SM, UkBanner } 
 import { useFeatureFlagURLOverrides } from 'featureFlags'
 import { useAtom } from 'jotai'
 import { useBag } from 'nft/hooks/useBag'
-import { lazy, memo, Suspense, useEffect, useLayoutEffect, useState } from 'react'
+import { lazy, memo, Suspense, useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async/lib/index'
 import { Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom'
 import { shouldDisableNFTRoutesAtom } from 'state/application/atoms'
@@ -24,6 +24,9 @@ import { MICROSITE_LINK } from 'utils/openDownloadApp'
 import { getCurrentPageFromLocation } from 'utils/urlRoutes'
 import { getCLS, getFCP, getFID, getLCP, Metric } from 'web-vitals'
 import { findRouteByPath, RouteDefinition, routes, useRouterConfig } from './RouteDefinitions'
+import { useIsChatbotPage } from 'hooks/useIsChatbot'
+import ChatSection from './Chatbot/ChatSection'
+import { ButtonSecondary } from 'components/Button'
 
 // The Chrome is always loaded, but is lazy-loaded because it is not needed without user interaction.
 // Annotating it with webpackPreload allows it to be ready when requested.
@@ -87,6 +90,26 @@ const HeaderWrapper = styled.div<{ transparent?: boolean; bannerIsVisible?: bool
     top: ${({ bannerIsVisible }) => (bannerIsVisible ? Math.max(UK_BANNER_HEIGHT_SM - scrollY, 0) : 0)}px;
   }
 `
+const MiniChatbotContainer = styled(ButtonSecondary)<{opened: boolean, opaque: boolean}>`
+  width: 100px;
+  height: 100px;
+  position: fixed;
+  background: ${({opened, opaque})=>opened ? "red": "blue"};
+  z-index: ${Z_INDEX.sticky};
+  bottom: 20px;
+  right: 20px;
+  display: ${({opaque})=> opaque ? "block": "none"};
+`;
+
+const ChatbotBox = styled.div<{opened: boolean}>`
+  width: 400px;
+  height: 400px;
+  background: red;
+  position: relative;
+  z-index: ${Z_INDEX.sticky};
+  bottom: 420px;
+  right: 420px;
+`;
 
 const useRenderUkBanner = () => {
   const originCountry = useAppSelector((state: AppState) => state.user.originCountry)
@@ -206,6 +229,8 @@ const ResetPageScrollEffect = memo(function ResetPageScrollEffect() {
 
 const Header = memo(function Header() {
   const [isScrolledDown, setIsScrolledDown] = useState(false)
+  const [isChatbotOpened, setChatbotOpened] = useState(false)
+  const displayChatbot = useIsChatbotPage()
   const isBagExpanded = useBag((state) => state.bagExpanded)
   const isHeaderTransparent = !isScrolledDown && !isBagExpanded
   const renderUkBanner = useRenderUkBanner()
@@ -218,9 +243,22 @@ const Header = memo(function Header() {
     return () => window.removeEventListener('scroll', scrollListener)
   }, [])
 
+
+  const ChatbotMini = useCallback(()=>{
+     return <MiniChatbotContainer onClick={()=>{
+        console.log(isChatbotOpened)
+        setChatbotOpened(!isChatbotOpened)
+        }} opaque={displayChatbot} opened={isChatbotOpened}>
+        <ChatbotBox opened={isChatbotOpened}>
+          <ChatSection/>
+        </ChatbotBox>
+      </MiniChatbotContainer>
+  }, [isChatbotOpened, displayChatbot])
+
   return (
     <HeaderWrapper transparent={isHeaderTransparent} bannerIsVisible={renderUkBanner} scrollY={scrollY}>
       <NavBar blur={isHeaderTransparent} />
+      <ChatbotMini/>
     </HeaderWrapper>
   )
 })
