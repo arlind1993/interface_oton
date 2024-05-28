@@ -26,7 +26,8 @@ import { getCLS, getFCP, getFID, getLCP, Metric } from 'web-vitals'
 import { findRouteByPath, RouteDefinition, routes, useRouterConfig } from './RouteDefinitions'
 import { useIsChatbotPage } from 'hooks/useIsChatbot'
 import ChatSection from './Chatbot/ChatSection'
-import { ButtonSecondary } from 'components/Button'
+import { ButtonPrimary, ButtonSecondary } from 'components/Button'
+import { AiIcon } from 'components/Logo/UniIcon'
 
 // The Chrome is always loaded, but is lazy-loaded because it is not needed without user interaction.
 // Annotating it with webpackPreload allows it to be ready when requested.
@@ -90,15 +91,16 @@ const HeaderWrapper = styled.div<{ transparent?: boolean; bannerIsVisible?: bool
     top: ${({ bannerIsVisible }) => (bannerIsVisible ? Math.max(UK_BANNER_HEIGHT_SM - scrollY, 0) : 0)}px;
   }
 `
-const MiniChatbotContainer = styled(ButtonSecondary)<{opened: boolean, opaque: boolean}>`
-  width: 100px;
-  height: 100px;
+const MiniChatbotContainer = styled(ButtonPrimary)<{opened: boolean, opaque: boolean}>`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   position: fixed;
-  background: ${({opened, opaque})=>opened ? "red": "blue"};
+  padding: 0;
+  display: ${({opaque})=> opaque ? "flex": "none"};
   z-index: ${Z_INDEX.sticky};
   bottom: 20px;
   right: 20px;
-  display: ${({opaque})=> opaque ? "block": "none"};
 `;
 
 const ChatbotBox = styled.div<{opened: boolean}>`
@@ -108,7 +110,7 @@ const ChatbotBox = styled.div<{opened: boolean}>`
   position: relative;
   z-index: ${Z_INDEX.sticky};
   bottom: 420px;
-  right: 420px;
+  right: 400px;
 `;
 
 const useRenderUkBanner = () => {
@@ -179,7 +181,7 @@ export default function App() {
 const Body = memo(function Body() {
   const routerConfig = useRouterConfig()
   const renderUkBanner = useRenderUkBanner()
-
+  
   return (
     <BodyWrapper bannerIsVisible={renderUkBanner}>
       <Suspense>
@@ -230,7 +232,7 @@ const ResetPageScrollEffect = memo(function ResetPageScrollEffect() {
 const Header = memo(function Header() {
   const [isScrolledDown, setIsScrolledDown] = useState(false)
   const [isChatbotOpened, setChatbotOpened] = useState(false)
-  const displayChatbot = useIsChatbotPage()
+  const displayChatbot = !useIsChatbotPage()
   const isBagExpanded = useBag((state) => state.bagExpanded)
   const isHeaderTransparent = !isScrolledDown && !isBagExpanded
   const renderUkBanner = useRenderUkBanner()
@@ -249,6 +251,7 @@ const Header = memo(function Header() {
         console.log(isChatbotOpened)
         setChatbotOpened(!isChatbotOpened)
         }} opaque={displayChatbot} opened={isChatbotOpened}>
+        <AiIcon style={{lineHeight: 35}} width={35} height={35}/>
         <ChatbotBox opened={isChatbotOpened}>
           <ChatSection/>
         </ChatbotBox>

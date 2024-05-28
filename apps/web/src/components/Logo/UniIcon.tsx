@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import HolidayUniIcon from './HolidayUniIcon'
+import { style } from 'd3'
 
 // ESLint reports `fill` is missing, whereas it exists on an SVGProps type
 export type SVGProps = React.SVGProps<SVGSVGElement> & {
@@ -10,7 +11,11 @@ export type SVGProps = React.SVGProps<SVGSVGElement> & {
   clickable?: boolean
 }
 
-export const UniIcon = ({ clickable, ...props }: SVGProps) => (
+export const UniIcon = ({ clickable, ...props }: SVGProps) => {
+  if(props.style){
+    props.style.verticalAlign = 'middle';
+  }
+  return (
   <Container clickable={clickable}>
     {HolidayUniIcon(props) !== null ? (
       <HolidayUniIcon {...props} />
@@ -20,9 +25,14 @@ export const UniIcon = ({ clickable, ...props }: SVGProps) => (
       </svg>
     )}
   </Container>
-)
+  )
+}
 
-export const AiIcon = ({ clickable, ...props }: SVGProps) => (
+export const AiIcon = ({ clickable, ...props }: SVGProps) => {
+  if(props.style){
+    props.style.verticalAlign = 'middle';
+  }
+  return (
   <Container clickable={clickable}>
     {HolidayUniIcon(props) !== null ? (
       <HolidayUniIcon {...props} />
@@ -47,11 +57,13 @@ export const AiIcon = ({ clickable, ...props }: SVGProps) => (
 
     )}
   </Container>
-)
+  )
+}
 
 
 
 const Container = styled.div<{ clickable?: boolean }>`
   position: relative;
+
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'auto')};
 `
