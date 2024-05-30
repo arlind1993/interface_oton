@@ -1,5 +1,5 @@
 import { ButtonEmphasis, ButtonPrimary, ButtonSecondary, ButtonSize, SmallButtonPrimary, ThemeButton } from 'components/Button';
-import {ChangeEvent, KeyboardEvent, memo, useCallback, useRef, useState} from 'react'
+import {ChangeEvent, KeyboardEvent, memo, useCallback, useEffect, useRef, useState} from 'react'
 import { Button } from 'rebass';
 import styled from 'styled-components'
 import Tooltip, { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
@@ -9,53 +9,11 @@ import { InputContainer, Input } from 'components/Settings/Input';
 import { ResizingTextArea } from 'components/TextInput';
 import { scrollbarStyle } from '../../components/SearchModal/CurrencyList/index.css';
 import {Botkit} from "botkit";
-import { ChatItem, updateChatItem } from 'state/chatbot/reducer';
+import { ChatItem, removeAfterChatItem, removeHistoryItem, updateChatItem } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import ChatInput from './ChatInput';
-import Row from 'components/Row';
 
 
-
-styled.input<{ isOpen?: boolean }>`
-//   background: no-repeat scroll 7px 7px;
-//   background-size: 20px 20px;
-//   background-position: 12px center;
-//   background-color: ${({ theme }) => theme.surface1};
-//   border-radius: 12px;
-//   border: 1px solid ${({ theme }) => theme.surface3};
-//   height: 100%;
-//   width: ${({ isOpen }) => (isOpen ? '200px' : '0')};
-//   font-size: 16px;
-//   font-weight: 485;
-//   padding-left: 40px;
-//   color: ${({ theme }) => theme.neutral2};
-//   transition-duration: ${({ theme }) => theme.transition.duration.fast};
-//   text-overflow: ellipsis;
-
-//   :hover {
-//     background-color: ${({ theme }) => theme.surface1};
-//   }
-
-//   :focus {
-//     outline: none;
-//     background-color: ${({ theme }) => theme.surface1};
-//     border-color: ${({ theme }) => theme.accent1};
-//     color: ${({ theme }) => theme.neutral1};
-//   }
-
-//   ::placeholder {
-//     color: ${({ theme }) => theme.neutral3};
-//   }
-//   ::-webkit-search-cancel-button {
-//     -webkit-appearance: none;
-//     appearance: none;
-//     height: ${20};
-//     width: ${20};
-//     margin-right: 10px;
-//     background-size: ${20} ${20};
-//     cursor: pointer;
-//   }
-// `
 
 const Section = styled.div`
   display: flex;
@@ -81,8 +39,7 @@ const iconActionStyle = {
 const ChatList = styled.div`
   display: flex;
   flex-direction: column;
-  width: clamp(400px, 100%, 600px);
-  max-height: calc(100vh - 72px - 80px - 10px - 150px);
+  flex: 1;
   overflow-y: auto;
   background: ${({theme} )=> theme.surface3};
 `;
@@ -148,20 +105,32 @@ const ButtonActionSecondary = styled(ButtonSecondary)`
 
 // const controller = new Botkit();
 
-function Chatbot() {
+function ChatSection() {
   const dispatch = useAppDispatch();
   const chats = useAppSelector((state) => state.chatbot.chats);
   console.log(chats);
   const refs = useRef<Array<HTMLTextAreaElement | null>>([]);
   const histories = useAppSelector((state) => state.chatbot.histories);
   console.log(histories);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [chats.length]); //
+
+
 
   const renderItem = useCallback((item: ChatItem, pos: number) => {
     const handleMouseEnter = () => dispatch(updateChatItem({refs, pos, hover: true}));
     const handleMouseLeave = () => dispatch(updateChatItem({refs, pos, hover: false}));
     const handleOnChange = (e: string)=> dispatch(updateChatItem({refs, pos, tempText: e}));
     const handleEdit = () => dispatch(updateChatItem({refs, pos, editing: true, tempText: item.editing ? item.tempText : undefined}));
-    const handleSubmit = () => dispatch(updateChatItem({refs, pos, editing: false, text: item.tempText}));
+    const handleSubmit = () => {
+      dispatch(updateChatItem({refs, pos, editing: false, text: item.tempText}))
+      dispatch(removeAfterChatItem({refs, pos}));
+    };
     const handleCancel = () => dispatch(updateChatItem({refs, pos, editing: false}));
     const handleCopy = () => navigator.clipboard.writeText(item.text);
     const handleKeyPresses = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -245,7 +214,7 @@ function Chatbot() {
 
   return (
     <Section>
-      <ChatList className={`${scrollbarStyle}`}>
+      <ChatList className={`${scrollbarStyle}`} ref={(e)=>scrollRef.current = e}>
         {chats.map((item, index)=> renderItem(item, index))}
       </ChatList>
       <ChatInput/>
@@ -253,4 +222,4 @@ function Chatbot() {
   );
 }
 
-export default memo(Chatbot);
+export default memo(ChatSection);

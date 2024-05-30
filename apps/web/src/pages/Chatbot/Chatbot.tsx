@@ -2,25 +2,33 @@ import { memo, useRef } from 'react'
 import styled from 'styled-components'
 import History from './History'
 import ChatSection from './ChatSection'
+import Row from 'components/Row'
 
 
 const Container = styled.main`
   display: flex;
   flex-direction: row;
   flex: 1;
-  bottom: 0;
   width: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
 `
 
+const ChatSectionContainer = styled.div`
+  display: flex;
+  height: calc(100vh  - 72px - 80px );
+  width: clamp(400px, 100%, 600px);
+  padding: 10px;
+`
 
 function Chatbot() {
   return (
     <Container data-testid="chatbot-page">
       <History></History>
-      <ChatSection></ChatSection>
+      <Row justify='center'>
+        <ChatSectionContainer>
+        <ChatSection></ChatSection>
+      </ChatSectionContainer>
+      </Row>
+      
     </Container>
   )
 }

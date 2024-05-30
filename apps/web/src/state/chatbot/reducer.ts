@@ -234,15 +234,15 @@ const walletsSlice = createSlice({
       pos: number,
       refs: MutableRefObject<(HTMLTextAreaElement | null)[]>
     }>){
-        state.histories = state.histories.filter((item, index) => index !== pos);
+        state.chats = state.chats.filter((_, index) => index !== pos);
         refs.current = refs.current.filter((_, index) => index !== pos);
     },
-    removeFromChatItem(state, {payload: {pos, refs}}:PayloadAction<{ 
+    removeAfterChatItem(state, {payload: {pos, refs}}:PayloadAction<{ 
       pos: number,
       refs: MutableRefObject<(HTMLTextAreaElement | null)[]>
     }>){
-        state.histories = state.histories.filter((item, index) => index < pos);
-        refs.current = refs.current.filter((_, index) => index < pos);
+        state.chats = state.chats.filter((_, index) => index <= pos);
+        refs.current = refs.current.filter((_, index) => index <= pos);
     },
   },
 })
@@ -252,7 +252,9 @@ export const {
   addChatItem, 
   updateChatItem, 
   updateHistoryItem, 
-  removeHistoryItem, 
+  removeHistoryItem,
+  removeAfterChatItem,
+  removeChatItem, 
   emptyChats,
   emptyHistories,
 } = walletsSlice.actions

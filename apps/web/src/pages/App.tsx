@@ -28,6 +28,7 @@ import { useIsChatbotPage } from 'hooks/useIsChatbot'
 import ChatSection from './Chatbot/ChatSection'
 import { ButtonPrimary, ButtonSecondary } from 'components/Button'
 import { AiIcon } from 'components/Logo/UniIcon'
+import { X } from 'ui/src/components/icons'
 
 // The Chrome is always loaded, but is lazy-loaded because it is not needed without user interaction.
 // Annotating it with webpackPreload allows it to be ready when requested.
@@ -91,26 +92,38 @@ const HeaderWrapper = styled.div<{ transparent?: boolean; bannerIsVisible?: bool
     top: ${({ bannerIsVisible }) => (bannerIsVisible ? Math.max(UK_BANNER_HEIGHT_SM - scrollY, 0) : 0)}px;
   }
 `
-const MiniChatbotContainer = styled(ButtonPrimary)<{opened: boolean, opaque: boolean}>`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  position: fixed;
-  padding: 0;
-  display: ${({opaque})=> opaque ? "flex": "none"};
-  z-index: ${Z_INDEX.sticky};
-  bottom: 20px;
-  right: 20px;
+const MiniChatbotContainer = styled.div<{opaque: boolean}>`
+  display: ${({opaque})=> opaque ? "block": "none"};
 `;
 
-const ChatbotBox = styled.div<{opened: boolean}>`
-  width: 400px;
-  height: 400px;
-  background: red;
-  position: relative;
+const ChatButton = styled(ButtonPrimary)<{opened: boolean}>`
   z-index: ${Z_INDEX.sticky};
-  bottom: 420px;
-  right: 400px;
+  bottom: 60px;
+  right: 20px;
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 1px solid ${({theme}) => theme.surface4};
+  border-radius: 50%;
+`
+
+const ChatbotBox = styled.div<{opened: boolean}>`
+  width: 300px;
+  height: 400px;
+  position: fixed;
+  z-index: ${Z_INDEX.sticky};
+  background: ${({theme})=> theme.surface1};
+  bottom: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  right: 20px;
+  display: flex;
+  border: 1px solid ${({theme}) => theme.surface4};
+
+  transform-origin: bottom right;
+  transition: transform 5s ease-in-out;
+  transform: scale(${({opened})=> opened ? 1: 0});
 `;
 
 const useRenderUkBanner = () => {
@@ -247,11 +260,17 @@ const Header = memo(function Header() {
 
 
   const ChatbotMini = useCallback(()=>{
-     return <MiniChatbotContainer onClick={()=>{
-        console.log(isChatbotOpened)
-        setChatbotOpened(!isChatbotOpened)
-        }} opaque={displayChatbot} opened={isChatbotOpened}>
-        <AiIcon style={{lineHeight: 35}} width={35} height={35}/>
+     return <MiniChatbotContainer opaque={displayChatbot}>
+        <ChatButton opened={isChatbotOpened} onClick={()=>{
+          console.log(isChatbotOpened)
+          setChatbotOpened(!isChatbotOpened)
+        }}>
+
+          
+          {isChatbotOpened ? (<X style= {{width: 30, height: 30}}/>)  :
+          (<AiIcon style={{lineHeight: 35}} width={35} height={35}/>)
+        }
+        </ChatButton> 
         <ChatbotBox opened={isChatbotOpened}>
           <ChatSection/>
         </ChatbotBox>

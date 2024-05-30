@@ -13,17 +13,15 @@ import styled from 'styled-components'
 import { Share } from "ui/src/components/icons";
 import { v4 as uuid } from 'uuid';
 
-const ChatInputContainer = styled.div`
-  width: clamp(400px, 100%, 600px);
-`;
 
 
 const Description = styled(InputContainer)<{
   enabled: boolean
 }>`
-    flex: 1;
-    min-height: unset;
+  flex: 1;
+  min-height: unset;
   text-align: left;
+  margin-right: 10px;
   padding: ${({enabled}) => enabled ? "4px 8px" : "0px"};
   border-radius: ${({enabled}) => enabled ? "12px" : "0px"};
   border: ${({enabled, theme, error }) => ((enabled ? "1": "0") + "px solid "+(error ? theme.critical : theme.surface2))};
@@ -37,10 +35,11 @@ const InputField = styled(ResizingTextArea)`
 `;
 
 const SubmitButton = styled(ButtonPrimary)`
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     padding: 0;
+    margin: 5px;
 `;
 
 function ChatInput(){
@@ -51,16 +50,18 @@ function ChatInput(){
     const chats = useAppSelector((state) => state.chatbot.chats);
     const dispatch = useAppDispatch();
     const onSubmit = useCallback((message: string) => {
+      if(message == "") return;
+      setInput("");
         if(isInChatbot && chats.length == 0){
             const historyId = uuid();
             dispatch(
                 addHistoryItem({
-                    id: historyId,
-                    hover: false,
-                    name: message.split(" ")[0],
-                    tempName: "",
-                    renaming: false,
-                    timestamp: Date.now()
+                  id: historyId,
+                  hover: false,
+                  name: message.split(" ")[0],
+                  tempName: "",
+                  renaming: false,
+                  timestamp: Date.now()
                 })
             );
             navigator("/chatbot/"+historyId);
@@ -82,7 +83,6 @@ function ChatInput(){
 
 
     return (
-      <ChatInputContainer>
         <Row style={{alignItems: 'flex-end'}}>
             <Description enabled={true}>
                 <InputField 
@@ -100,12 +100,12 @@ function ChatInput(){
                     value={input} 
                 />
             </Description>
-            <SubmitButton >
-                <Share style={{zIndex: 50, width: 10, height: 10}}></Share>
+            <SubmitButton onClick={()=>{
+              onSubmit(input);
+            }}>
+                <Share style={{zIndex: 50, width: 15, height: 15}}></Share>
             </SubmitButton>
-        </Row>
-        
-      </ChatInputContainer>
+      </Row>
     );
   }
   
