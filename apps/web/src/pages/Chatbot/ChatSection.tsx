@@ -128,8 +128,13 @@ function ChatSection() {
     const handleOnChange = (e: string)=> dispatch(updateChatItem({refs, pos, tempText: e}));
     const handleEdit = () => dispatch(updateChatItem({refs, pos, editing: true, tempText: item.editing ? item.tempText : undefined}));
     const handleSubmit = () => {
-      dispatch(updateChatItem({refs, pos, editing: false, text: item.tempText}))
-      dispatch(removeAfterChatItem({refs, pos}));
+      const trimmedMsg = item.tempText.trim();
+      if(trimmedMsg == ""){
+        
+      }else{
+        dispatch(updateChatItem({refs, pos, editing: false, text: trimmedMsg}))
+        dispatch(removeAfterChatItem({refs, pos}));
+      }
     };
     const handleCancel = () => dispatch(updateChatItem({refs, pos, editing: false}));
     const handleCopy = () => navigator.clipboard.writeText(item.text);

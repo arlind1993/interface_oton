@@ -4,7 +4,7 @@ import { scrollbarStyle } from "components/SearchModal/CurrencyList/index.css";
 import { InputContainer } from "components/Settings/Input";
 import { ResizingTextArea } from "components/TextInput";
 import { useIsChatbotPage } from "hooks/useIsChatbot";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addChatItem, addHistoryItem } from "state/chatbot/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
@@ -49,9 +49,12 @@ function ChatInput(){
     const isInChatbot = useIsChatbotPage();
     const chats = useAppSelector((state) => state.chatbot.chats);
     const dispatch = useAppDispatch();
+
+    
     const onSubmit = useCallback((message: string) => {
+      message = message.trim()
       if(message == "") return;
-      setInput("");
+        setInput("");
         if(isInChatbot && chats.length == 0){
             const historyId = uuid();
             dispatch(
@@ -67,15 +70,15 @@ function ChatInput(){
             navigator("/chatbot/"+historyId);
         }
         dispatch(
-            addChatItem({
-                id: chats.length + 1,
-                hover: false,
-                editing: false,
-                isChatbotText: false,
-                text: message,
-                tempText: "",
-                type: "text"                 
-            })
+          addChatItem({
+            id: chats.length + 1,
+            hover: false,
+            editing: false,
+            isChatbotText: false,
+            text: message,
+            tempText: "",
+            type: "text"                 
+          })
         );
 
         console.log(message);
