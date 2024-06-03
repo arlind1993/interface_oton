@@ -110,7 +110,7 @@ function InfoSection() {
           <Trans>Don&apos;t have a Uniswap wallet?</Trans>
         </ThemedText.SubHeaderSmall>
         <ThemedText.BodySmall color="neutral2">
-          <Trans>Safely store and swap tokens with the Uniswap app. Available on iOS and Android.</Trans>
+          <Trans>Safely store and swap tokens with the Oton app. Available on iOS and Android.</Trans>
         </ThemedText.BodySmall>
       </AutoColumn>
       <Column>

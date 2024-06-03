@@ -125,7 +125,6 @@ export const ResizingTextArea = memo(
     const inputRef = useRef<HTMLTextAreaElement>(document.createElement('textarea'));
     const disable = disabled ?? false;
     const handleInput = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-        console.log("repeat")
         inputRef.current.style.height = 'auto'
         inputRef.current.style.height = inputRef.current.scrollHeight + 'px'
         onUserInput(event.target.value)
