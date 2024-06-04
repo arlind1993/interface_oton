@@ -11,11 +11,12 @@ export interface HistoryItem {
     renaming: boolean;
 }
 export interface ChatItem {
-    id: number;
+    id: string;
     text: string;
     tempText: string;
     type: string;
     isChatbotText: boolean;
+    status: string;
     hover: boolean;
     editing: boolean;
     options?: OptionsItem[];
@@ -69,25 +70,27 @@ const initialState: ChatbotState = {
       ],
     chats: [
         {
-          id: 1,
+          id: "1",
           text: "Hello, how can I help you ",
           tempText: "",
           isChatbotText: true,
           type: "text",
           hover: false,
           editing: false,
+          status: "completed",
         },
         {
-          id: 2,
+          id: "2",
           text: "I'd like to know ....",
           tempText: "",
           type: "text",
           isChatbotText: false,
           hover: false,
           editing: false,
+          status: "completed",
         },
         {
-          id: 3,
+          id: "3",
           text: "Hi i can help you with that",
           tempText: "",
           type: "options",
@@ -98,15 +101,17 @@ const initialState: ChatbotState = {
           isChatbotText: true,
           hover: false,
           editing: false,
+          status: "completed",
         },
         {
-          id: 4,
+          id: "4",
           text: "4",
           tempText: "",
           isChatbotText: true,
           hover: false,
           type: "text",
           editing: false,
+          status: "completed",
         },
       ],
 }
@@ -121,15 +126,16 @@ const walletsSlice = createSlice({
     addChatItem(state, { payload }: PayloadAction<ChatItem>) {
       state.chats =  [...state.chats, payload]
     },  
-    updateChatItem( state, { payload: { item, pos, hover, editing, text, tempText, refs } }: 
+    updateChatItem( state, { payload: { item, pos, hover, editing, text, status, tempText, refs } }: 
         PayloadAction<{ 
         item?: ChatItem, 
         pos: number,
         hover?: boolean,
         editing?: boolean,
         text?: string,
+        status?: string,
         tempText?: string,
-        refs: MutableRefObject<(HTMLTextAreaElement | null)[]>
+        refs?: MutableRefObject<(HTMLTextAreaElement | null)[]>
     }>) {
         const dcp = [...state.chats];
         const index = pos;
@@ -148,23 +154,23 @@ const walletsSlice = createSlice({
             if(editing){
               item.tempText = item.text;
               setTimeout(()=>{
-                if(refs.current[index]){
+                if(refs && refs.current[index]){
                   refs.current[index]?.focus();
                 }
               });
             }else{
-              console.log(item);
               item.tempText = "";
             }
-            if(refs.current[index]){
+            if(refs && refs.current[index]){
               refs.current[index]!.innerHTML = item.text;
             }
           }
-          console.log(5);
           if(text != undefined && text != null){
             item.text = text;
           }
-          console.log({ item, text, tempText, });
+          if(status != undefined && status != null){
+            item.status = status;
+          }
           if(tempText != undefined && tempText != null){
             item.tempText = tempText;
           }
@@ -181,7 +187,7 @@ const walletsSlice = createSlice({
         renaming?: boolean,
         name?: string,
         tempName?: string,
-        refs: MutableRefObject<(HTMLInputElement | null)[]>
+        refs?: MutableRefObject<(HTMLInputElement | null)[]>
     }>) {
         const dcp = [...state.histories];
         const index = pos;
@@ -195,15 +201,15 @@ const walletsSlice = createSlice({
             if(renaming){
               item.tempName = item.name;
               setTimeout(()=>{
-                if(refs.current[index]){
+                if(refs && refs.current[index]){
                   refs.current[index]?.focus();
                 }
-              });
+              } );
             }else{
               console.log(item);
               item.tempName = "";
             }
-            if(refs.current[index]){
+            if(refs && refs.current[index]){
               refs.current[index]!.innerHTML = item.name;
             }
           }

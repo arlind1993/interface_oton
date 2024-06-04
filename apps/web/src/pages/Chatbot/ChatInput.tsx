@@ -6,12 +6,14 @@ import { ResizingTextArea } from "components/TextInput";
 import { useIsChatbotPage } from "hooks/useIsChatbot";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addChatItem, addHistoryItem } from "state/chatbot/reducer";
+import { addChatItem, addHistoryItem, updateChatItem } from "state/chatbot/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 
 import styled from 'styled-components'
 import { Share } from "ui/src/components/icons";
 import { v4 as uuid } from 'uuid';
+import { witBotSendMessage, SuccessWit } from './req';
+import { translateToMessage } from "./handleMessage";
 
 
 
@@ -49,7 +51,6 @@ function ChatInput(){
     const isInChatbot = useIsChatbotPage();
     const chats = useAppSelector((state) => state.chatbot.chats);
     const dispatch = useAppDispatch();
-
     
     const onSubmit = useCallback((message: string) => {
       message = message.trim()
@@ -69,19 +70,73 @@ function ChatInput(){
             );
             navigator("/chatbot/"+historyId);
         }
+        const length = chats.length;
         dispatch(
           addChatItem({
-            id: chats.length + 1,
+            id: uuid(),
             hover: false,
             editing: false,
             isChatbotText: false,
             text: message,
             tempText: "",
-            type: "text"                 
+            type: "text",
+            status: "completed",                 
           })
         );
+        setTimeout(()=>dispatch(
+          addChatItem({
+            id: uuid(),
+            hover: false,
+            editing: false,
+            isChatbotText: true,
+            text: "Providing an answer...",
+            tempText: "",
+            type: "text",
+            status: "sending",                 
+          })
+        ), 100)
+        
+
 
         console.log(message);
+        witBotSendMessage(message).then((res)=>{
+          let message = "";
+          if(res.error){
+            message = "No response, Connection failed";
+            dispatch(updateChatItem({
+              pos: length,
+              status: "completed",
+              text: message,
+            }));
+          }else if(res.success){
+            let intent: {value: string, confidence: number}| null = null;
+            let entities: ({value: string, name: string, role?: string, confidence: number})[] = [];
+            if(res.success.intents && res.success.intents.length > 0){
+              intent = {
+                value: res.success.intents[0].name,
+                confidence: res.success.intents[0].confidence,
+              };
+            }
+            if(res.success.entities){
+              Object.values(res.success.entities).forEach(e=> {
+                e.forEach(e=>{
+                  entities.push({
+                    confidence: e.confidence,
+                    value: e.value,
+                    name: e.name,
+                    role: e.role,
+                  })
+                })  
+              });
+            }
+            message = translateToMessage(intent, entities);
+            dispatch(updateChatItem({
+              pos: length +1,
+              status: "completed",
+              text: message,
+            }));
+          }
+        })
     }, [chats]);
 
 
@@ -114,4 +169,5 @@ function ChatInput(){
   
   
   export default memo(ChatInput)
+
   
