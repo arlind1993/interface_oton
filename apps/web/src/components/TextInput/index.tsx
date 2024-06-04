@@ -108,7 +108,7 @@ export const ResizingTextArea = memo(
     placeholder,
     fontSize,
     disabled,
-    ref,
+    refer,
     onKeyDown,
     style,
   }: {
@@ -118,7 +118,7 @@ export const ResizingTextArea = memo(
     placeholder: string
     fontSize: string
     disabled?: boolean 
-    ref?: (e: HTMLTextAreaElement | null) => HTMLTextAreaElement | null
+    refer?: (e: HTMLTextAreaElement | null) => HTMLTextAreaElement | null
     onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement> 
     style?: CSSProperties
   }) => {
@@ -147,7 +147,7 @@ export const ResizingTextArea = memo(
         onKeyDown={onKeyDown}
         value={value}
         fontSize={fontSize}
-        ref={ref ?? inputRef}
+        ref={refer ?? inputRef}
       />
     )
   }

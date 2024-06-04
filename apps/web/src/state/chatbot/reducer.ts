@@ -30,90 +30,90 @@ export interface OptionsItem {
 }
 
 export interface ChatbotState {
-    histories: HistoryItem[],
-    chats: ChatItem[],
+    histories: Record<string, HistoryItem>,
+    chats: Record<string, ChatItem>,
 }
 const initialState: ChatbotState = {
-    histories: [
-        {
-          id: "2",
-          name: "d",
-          tempName: "",
-          timestamp: 1715076642000,
-          hover: false,
-          renaming: false,
-        },
-        {
-          id: "1",
-          name: "",
-          tempName: "",
-          timestamp: 1714990242000,
-          hover: false,
-          renaming: false,
-        },
-        {
-          id: "5",
-          name: "3",
-          tempName: "",
-          timestamp: 1713607842000,
-          hover: false,
-          renaming: false,
-        },
-        {
-          id: "23",
-          name: "432332",
-          tempName: "",
-          timestamp: 1716199842000,
-          hover: false,
-          renaming: false,
-        },
+  histories: {
+    "2": {
+      id: "2",
+      name: "d",
+      tempName: "",
+      timestamp: 1715076642000,
+      hover: false,
+      renaming: false,
+    },
+    "1": {
+      id: "1",
+      name: "",
+      tempName: "",
+      timestamp: 1714990242000,
+      hover: false,
+      renaming: false,
+    },
+    "5": {
+      id: "5",
+      name: "3",
+      tempName: "",
+      timestamp: 1713607842000,
+      hover: false,
+      renaming: false,
+    },
+    "23": {
+      id: "23",
+      name: "432332",
+      tempName: "",
+      timestamp: 1716199842000,
+      hover: false,
+      renaming: false,
+    },
+  },
+  chats: {
+    "1" : {
+      id: "1",
+      text: "Hello, how can I help you ",
+      tempText: "",
+      isChatbotText: true,
+      type: "text",
+      hover: false,
+      editing: false,
+      status: "completed",
+    },
+    "2": {
+      id: "2",
+      text: "I'd like to know ....",
+      tempText: "",
+      type: "text",
+      isChatbotText: false,
+      hover: false,
+      editing: false,
+      status: "completed",
+    },
+    "3":{
+      id: "3",
+      text: "Hi i can help you with that",
+      tempText: "",
+      type: "options",
+      options: [
+        {id: 1, text: "Go to main", href: "/", selected: false},
+        {id: 2, text: "Go to explore", href: "/explore", selected: false},
       ],
-    chats: [
-        {
-          id: "1",
-          text: "Hello, how can I help you ",
-          tempText: "",
-          isChatbotText: true,
-          type: "text",
-          hover: false,
-          editing: false,
-          status: "completed",
-        },
-        {
-          id: "2",
-          text: "I'd like to know ....",
-          tempText: "",
-          type: "text",
-          isChatbotText: false,
-          hover: false,
-          editing: false,
-          status: "completed",
-        },
-        {
-          id: "3",
-          text: "Hi i can help you with that",
-          tempText: "",
-          type: "options",
-          options: [
-            {id: 1, text: "Go to main", href: "/", selected: false},
-            {id: 2, text: "Go to explore", href: "/explore", selected: false},
-          ],
-          isChatbotText: true,
-          hover: false,
-          editing: false,
-          status: "completed",
-        },
-        {
-          id: "4",
-          text: "4",
-          tempText: "",
-          isChatbotText: true,
-          hover: false,
-          type: "text",
-          editing: false,
-          status: "completed",
-        },
-      ],
+      isChatbotText: true,
+      hover: false,
+      editing: false,
+      status: "completed",
+    },
+    "4":{
+      id: "4",
+      text: "4",
+      tempText: "",
+      isChatbotText: true,
+      hover: false,
+      type: "text",
+      editing: false,
+      status: "completed",
+    },
+  },
 }
 
 const walletsSlice = createSlice({
@@ -121,63 +121,18 @@ const walletsSlice = createSlice({
   initialState,
   reducers: {
     addHistoryItem(state, { payload }: PayloadAction<HistoryItem>) {
-      state.histories = [...state.histories, payload]
+      state.histories[payload.id] = payload
     },
     addChatItem(state, { payload }: PayloadAction<ChatItem>) {
-      state.chats =  [...state.chats, payload]
+      state.chats[payload.id] = payload;
     },  
-    updateChatItem( state, { payload: { item, pos, hover, editing, text, status, tempText, refs } }: 
-        PayloadAction<{ 
-        item?: ChatItem, 
-        pos: number,
-        hover?: boolean,
-        editing?: boolean,
-        text?: string,
-        status?: string,
-        tempText?: string,
-        refs?: MutableRefObject<(HTMLTextAreaElement | null)[]>
+    updateChatItem( state, { payload: { id, item} }: PayloadAction<{ 
+      id: string,
+      item: Partial<ChatItem>
     }>) {
-        const dcp = [...state.chats];
-        const index = pos;
-        item = dcp[index];
-
-        console.log(1);
-        if(index >= 0){
-
-          console.log(2);
-          if(hover != undefined && hover != null){
-            item.hover = hover;
-          }
-          console.log(3);
-          if(editing != undefined && editing != null){
-            item.editing = editing;
-            if(editing){
-              item.tempText = item.text;
-              setTimeout(()=>{
-                if(refs && refs.current[index]){
-                  refs.current[index]?.focus();
-                }
-              });
-            }else{
-              item.tempText = "";
-            }
-            if(refs && refs.current[index]){
-              refs.current[index]!.innerHTML = item.text;
-            }
-          }
-          if(text != undefined && text != null){
-            item.text = text;
-          }
-          if(status != undefined && status != null){
-            item.status = status;
-          }
-          if(tempText != undefined && tempText != null){
-            item.tempText = tempText;
-          }
-          dcp[index] = item;
-          state.chats = dcp;
-        }
-        
+      if(state.chats[id]){
+        Object.assign(state.chats[id], item);
+      }
     },
     updateHistoryItem(state, { payload: { item, pos, hover, renaming, name, tempName, refs } }: 
         PayloadAction<{ 
@@ -189,39 +144,9 @@ const walletsSlice = createSlice({
         tempName?: string,
         refs?: MutableRefObject<(HTMLInputElement | null)[]>
     }>) {
-        const dcp = [...state.histories];
-        const index = pos;
-        item = dcp[pos];
-        if(index >= 0){
-          if(hover != undefined && hover != null){
-            item.hover = hover;
-          }
-          if(renaming != undefined && renaming != null){
-            item.renaming = renaming;
-            if(renaming){
-              item.tempName = item.name;
-              setTimeout(()=>{
-                if(refs && refs.current[index]){
-                  refs.current[index]?.focus();
-                }
-              } );
-            }else{
-              console.log(item);
-              item.tempName = "";
-            }
-            if(refs && refs.current[index]){
-              refs.current[index]!.innerHTML = item.name;
-            }
-          }
-          if(name != undefined && name != null){
-            item.name = name;
-          }
-          if(tempName != undefined && tempName != null){
-            item.tempName = tempName;
-          }
-          dcp[index] = item;
-          state.histories = dcp;
-        }
+      if(state.histories[id]){
+        Object.assign(state.histories[id], item);
+      }
     },
     emptyChats(state){
       state.chats = [];

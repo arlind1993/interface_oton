@@ -122,11 +122,13 @@ function ChatSection() {
 
 
 
-  const renderItem = useCallback((item: ChatItem, pos: number) => {
+  const renderItem = useCallback((item: ChatItem, id: string) => {
     const handleMouseEnter = () => dispatch(updateChatItem({refs, pos, hover: true}));
     const handleMouseLeave = () => dispatch(updateChatItem({refs, pos, hover: false}));
     const handleOnChange = (e: string)=> dispatch(updateChatItem({refs, pos, tempText: e}));
-    const handleEdit = () => dispatch(updateChatItem({refs, pos, editing: true, tempText: item.editing ? item.tempText : undefined}));
+    const handleEdit = () => {
+      refs
+    }dispatch(updateChatItem({refs, pos, editing: true, tempText: item.editing ? item.tempText : undefined}));
     const handleSubmit = () => {
       const trimmedMsg = item.tempText.trim();
       if(trimmedMsg == ""){
@@ -167,7 +169,7 @@ function ChatSection() {
               placeholder=''
               className={`${scrollbarStyle}`}
               onUserInput={handleOnChange}
-              ref={(e) => refs.current[pos] = e}
+              refer={(e) => refs.current[pos] = e}
               onKeyDown={handleKeyPresses}
               value={item.editing ? item.tempText : item.text}
             />
@@ -220,6 +222,7 @@ function ChatSection() {
   return (
     <Section>
       <ChatList className={`${scrollbarStyle}`} ref={(e)=>scrollRef.current = e}>
+        {Object.entries(chats).map((id, item) => renderItem(item, id))}
         {chats.map((item, index)=> renderItem(item, index))}
       </ChatList>
       <ChatInput/>

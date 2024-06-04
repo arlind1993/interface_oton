@@ -52,6 +52,8 @@ function ChatInput(){
     const chats = useAppSelector((state) => state.chatbot.chats);
     const dispatch = useAppDispatch();
     
+
+    
     const onSubmit = useCallback((message: string) => {
       message = message.trim()
       if(message == "") return;
@@ -144,7 +146,7 @@ function ChatInput(){
         <Row style={{alignItems: 'flex-end'}}>
             <Description enabled={true}>
                 <InputField 
-                    ref={(e)=>inputRef.current = e}
+                    refer={(e)=>inputRef.current = e}
                     fontSize='16'
                     placeholder='Message OTON AI'
                     className={`${scrollbarStyle}`}
