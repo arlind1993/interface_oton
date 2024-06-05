@@ -9,9 +9,10 @@ import { InputContainer, Input } from 'components/Settings/Input';
 import { ResizingTextArea } from 'components/TextInput';
 import { scrollbarStyle } from '../../components/SearchModal/CurrencyList/index.css';
 import {Botkit} from "botkit";
-import { ChatItem, removeAfterChatItem, removeHistoryItem, updateChatItem } from 'state/chatbot/reducer';
+import { ChatItem, removeChatItem, removeHistoryItem, updateChatItem, updateHistoryItem } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import ChatInput from './ChatInput';
+import { useParams } from 'react-router-dom';
 
 
 
@@ -109,7 +110,8 @@ function ChatSection() {
   const dispatch = useAppDispatch();
   const chats = useAppSelector((state) => state.chatbot.chats);
   console.log(chats);
-  const refs = useRef<Array<HTMLTextAreaElement | null>>([]);
+  const {chatId} = useParams<{ chatId: string;}>();
+  const refs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   const histories = useAppSelector((state) => state.chatbot.histories);
   console.log(histories);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -123,23 +125,87 @@ function ChatSection() {
 
 
   const renderItem = useCallback((item: ChatItem, id: string) => {
-    const handleMouseEnter = () => dispatch(updateChatItem({refs, pos, hover: true}));
-    const handleMouseLeave = () => dispatch(updateChatItem({refs, pos, hover: false}));
-    const handleOnChange = (e: string)=> dispatch(updateChatItem({refs, pos, tempText: e}));
+    const handleMouseEnter = () => {
+      dispatch(
+        updateChatItem([
+          {id, item: {hover: true}}
+        ])
+      );
+    }
+    const handleMouseLeave = () => {
+      dispatch(
+        updateChatItem([
+          {id, item: {hover: false}}
+        ])
+      );
+    }
+    const handleOnChange = (e: string)=>{
+      dispatch(
+        updateChatItem([
+          {id, item: {tempText: e}}
+        ])
+      );
+    }
     const handleEdit = () => {
-      refs
-    }dispatch(updateChatItem({refs, pos, editing: true, tempText: item.editing ? item.tempText : undefined}));
+      dispatch(
+        updateChatItem([
+          {id, item: {editing: true, tempText: item.editing ? item.tempText : item.text}}
+        ])
+      );
+      setTimeout(()=>{
+        refs.current[id]?.focus();
+      });
+    }
     const handleSubmit = () => {
       const trimmedMsg = item.tempText.trim();
-      if(trimmedMsg == ""){
-        
+      if(trimmedMsg === ""){
+
       }else{
-        dispatch(updateChatItem({refs, pos, editing: false, text: trimmedMsg}))
-        dispatch(removeAfterChatItem({refs, pos}));
+        dispatch(
+          updateChatItem([
+            {id, item: {editing: true, text: trimmedMsg, tempText: ""}}
+          ])
+        );
+        const removeChats: Array<string> = [];
+        const leftChats: Array<string> = [];
+        let after = false;
+        if(chatId && chatId in histories){
+          for(const cid of histories[chatId].chats){
+            if(after){
+              removeChats.push(cid);
+            }else{
+              leftChats.push(cid);
+            }
+            if(id === cid){
+              after = true;
+            }
+          }
+          dispatch(
+            updateHistoryItem([
+              {id, item: {chats: leftChats}}
+            ])
+          )
+        }
+        dispatch(
+          removeChatItem({ids: removeChats, historyId: chatId})
+        );
+        for(const cid of removeChats){
+          if(cid in chats){
+            delete chats[cid];
+          }
+        }
       }
     };
-    const handleCancel = () => dispatch(updateChatItem({refs, pos, editing: false}));
-    const handleCopy = () => navigator.clipboard.writeText(item.text);
+    const handleCancel = () => {
+      dispatch(
+        updateChatItem([
+          {id, item:{editing: false, tempText: ""}}
+        ])
+      );
+    }
+    const handleCopy = () => {
+      navigator.clipboard.writeText(item.text);
+    }
     const handleKeyPresses = (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if(e.key === 'Enter' && !e.shiftKey){
         handleSubmit();
@@ -169,7 +235,7 @@ function ChatSection() {
               placeholder=''
               className={`${scrollbarStyle}`}
               onUserInput={handleOnChange}
-              refer={(e) => refs.current[pos] = e}
+              refer={(e) => refs.current[id] = e}
               onKeyDown={handleKeyPresses}
               value={item.editing ? item.tempText : item.text}
             />
@@ -215,15 +281,14 @@ function ChatSection() {
         
       </Chatbox>
     );
-  }, [chats]);
+  }, [chats, histories, chatId]);
 
   
 
   return (
     <Section>
       <ChatList className={`${scrollbarStyle}`} ref={(e)=>scrollRef.current = e}>
-        {Object.entries(chats).map((id, item) => renderItem(item, id))}
-        {chats.map((item, index)=> renderItem(item, index))}
+        {Object.entries(chats).map((e) => renderItem(e[1], e[0]))}
       </ChatList>
       <ChatInput/>
     </Section>

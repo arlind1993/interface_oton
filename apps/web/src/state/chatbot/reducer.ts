@@ -3,35 +3,36 @@ import { MutableRefObject } from 'react';
 // import { shallowEqual } from 'react-redux'
 
 export interface HistoryItem {
-    id: string;
-    name: string;
-    tempName: string;
-    timestamp: number;
-    hover: boolean;
-    renaming: boolean;
+  id: string;
+  name: string;
+  tempName: string;
+  timestamp: number;
+  hover: boolean;
+  renaming: boolean;
+  chats: string[];
 }
 export interface ChatItem {
-    id: string;
-    text: string;
-    tempText: string;
-    type: string;
-    isChatbotText: boolean;
-    status: string;
-    hover: boolean;
-    editing: boolean;
-    options?: OptionsItem[];
+  id: string;
+  text: string;
+  tempText: string;
+  type: string;
+  isChatbotText: boolean;
+  status: string;
+  hover: boolean;
+  editing: boolean;
+  options?: OptionsItem[];
 }
-  
+
 export interface OptionsItem {
-    id: number;
-    text: string;
-    href: string;
-    selected: false;
+  id: number;
+  text: string;
+  href: string;
+  selected: false;
 }
 
 export interface ChatbotState {
-    histories: Record<string, HistoryItem>,
-    chats: Record<string, ChatItem>,
+  histories: Record<string, HistoryItem>;
+  chats: Record<string, ChatItem>;
 }
 const initialState: ChatbotState = {
   histories: {
@@ -42,6 +43,7 @@ const initialState: ChatbotState = {
       timestamp: 1715076642000,
       hover: false,
       renaming: false,
+      chats: []
     },
     "1": {
       id: "1",
@@ -50,6 +52,7 @@ const initialState: ChatbotState = {
       timestamp: 1714990242000,
       hover: false,
       renaming: false,
+      chats: []
     },
     "5": {
       id: "5",
@@ -58,6 +61,7 @@ const initialState: ChatbotState = {
       timestamp: 1713607842000,
       hover: false,
       renaming: false,
+      chats: []
     },
     "23": {
       id: "23",
@@ -66,6 +70,7 @@ const initialState: ChatbotState = {
       timestamp: 1716199842000,
       hover: false,
       renaming: false,
+      chats: []
     },
   },
   chats: {
@@ -120,60 +125,61 @@ const walletsSlice = createSlice({
   name: 'chatbot',
   initialState,
   reducers: {
-    addHistoryItem(state, { payload }: PayloadAction<HistoryItem>) {
-      state.histories[payload.id] = payload
-    },
-    addChatItem(state, { payload }: PayloadAction<ChatItem>) {
-      state.chats[payload.id] = payload;
-    },  
-    updateChatItem( state, { payload: { id, item} }: PayloadAction<{ 
-      id: string,
-      item: Partial<ChatItem>
-    }>) {
-      if(state.chats[id]){
-        Object.assign(state.chats[id], item);
+    addHistoryItem(state, { payload: {items} }: PayloadAction<{items: Array<HistoryItem>}>) {
+      for(const item of items){
+        state.histories[item.id] = item
       }
     },
-    updateHistoryItem(state, { payload: { item, pos, hover, renaming, name, tempName, refs } }: 
-        PayloadAction<{ 
-        item?: HistoryItem, 
-        pos: number,
-        hover?: boolean,
-        renaming?: boolean,
-        name?: string,
-        tempName?: string,
-        refs?: MutableRefObject<(HTMLInputElement | null)[]>
-    }>) {
-      if(state.histories[id]){
-        Object.assign(state.histories[id], item);
+    addChatItem(state, { payload: {items, historyId} }: PayloadAction<{items: Array<ChatItem>, historyId?: string}>) {
+      for(const item of items){
+        state.chats[item.id] = item
+      }
+      if(historyId && historyId in state.histories){
+        state.histories[historyId].chats.push(...items.map((e)=>e.id));
+      }
+    },  
+    updateChatItem( state, {payload}: PayloadAction<Array<{ 
+      id: string,
+      item: Partial<ChatItem>
+    }>>) {
+      for(const {id, item} of payload){
+        if(state.chats[id]){
+          Object.assign(state.chats[id], item);
+        }
+      }
+    },
+    updateHistoryItem(state, { payload }: PayloadAction<Array<{ 
+      item: Partial<HistoryItem>, 
+      id: string,
+    }>>) {
+      for(const {id, item} of payload){
+        if(state.histories[id]){
+          Object.assign(state.histories[id], item);
+        }
       }
     },
     emptyChats(state){
-      state.chats = [];
+      state.chats = {}
     },
     emptyHistories(state){
-      state.histories = [];
+      state.histories = {}
     },
-    removeHistoryItem(state, {payload: {pos, refs}}:PayloadAction<{ 
-        pos: number,
-        refs: MutableRefObject<(HTMLInputElement | null)[]>
-    }>){
-        state.histories = state.histories.filter((item, index) => index !== pos);
-        refs.current = refs.current.filter((_, index) => index !== pos);
+    removeHistoryItem(state, {payload: {ids}}:PayloadAction<{ids: Array<string>}>){
+      for(const id of ids){
+        if (id in state.histories) {
+          delete state.histories[id];
+        }
+      }
     },
-    removeChatItem(state, {payload: {pos, refs}}:PayloadAction<{ 
-      pos: number,
-      refs: MutableRefObject<(HTMLTextAreaElement | null)[]>
-    }>){
-        state.chats = state.chats.filter((_, index) => index !== pos);
-        refs.current = refs.current.filter((_, index) => index !== pos);
-    },
-    removeAfterChatItem(state, {payload: {pos, refs}}:PayloadAction<{ 
-      pos: number,
-      refs: MutableRefObject<(HTMLTextAreaElement | null)[]>
-    }>){
-        state.chats = state.chats.filter((_, index) => index <= pos);
-        refs.current = refs.current.filter((_, index) => index <= pos);
+    removeChatItem(state, {payload: {ids, historyId}}:PayloadAction<{ids: Array<string>, historyId?: string}>){  
+      for(const id of ids){
+        if (id in state.chats) {
+          delete state.chats[id];
+        }
+      }
+      if(historyId && historyId in state.histories){
+        state.histories[historyId].chats = state.histories[historyId].chats.filter((hcid)=>  ids.every((cid)=> cid != hcid));
+      }
     },
   },
 })
@@ -184,7 +190,6 @@ export const {
   updateChatItem, 
   updateHistoryItem, 
   removeHistoryItem,
-  removeAfterChatItem,
   removeChatItem, 
   emptyChats,
   emptyHistories,

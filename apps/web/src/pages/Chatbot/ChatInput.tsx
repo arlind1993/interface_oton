@@ -5,7 +5,7 @@ import { InputContainer } from "components/Settings/Input";
 import { ResizingTextArea } from "components/TextInput";
 import { useIsChatbotPage } from "hooks/useIsChatbot";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { addChatItem, addHistoryItem, updateChatItem } from "state/chatbot/reducer";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 
@@ -50,41 +50,44 @@ function ChatInput(){
     const [input, setInput] = useState<string>("");
     const isInChatbot = useIsChatbotPage();
     const chats = useAppSelector((state) => state.chatbot.chats);
+    const histories = useAppSelector((state) => state.chatbot.histories);
     const dispatch = useAppDispatch();
-    
+    const {chatId} = useParams<{chatId: string}>();
 
     
     const onSubmit = useCallback((message: string) => {
       message = message.trim()
       if(message == "") return;
-        setInput("");
-        if(isInChatbot && chats.length == 0){
-            const historyId = uuid();
-            dispatch(
-                addHistoryItem({
-                  id: historyId,
-                  hover: false,
-                  name: message.split(" ")[0],
-                  tempName: "",
-                  renaming: false,
-                  timestamp: Date.now()
-                })
-            );
-            navigator("/chatbot/"+historyId);
+      setInput("");
+      const cid = uuid();
+      dispatch(
+        addChatItem([{
+          id: cid,
+          hover: false,
+          editing: false,
+          isChatbotText: false,
+          text: message,
+          tempText: "",
+          type: "text",
+          status: "completed",                 
+        }])
+      );
+      if(isInChatbot && !chatId){
+          const historyId = uuid();
+          dispatch(
+            addHistoryItem([{
+              id: historyId,
+              hover: false,
+              name: message.split(" ")[0],
+              tempName: "",
+              renaming: false,
+              timestamp: Date.now(),
+              chats: [cid]
+            }])
+          );
+          navigator("/chatbot/"+historyId);
         }
         const length = chats.length;
-        dispatch(
-          addChatItem({
-            id: uuid(),
-            hover: false,
-            editing: false,
-            isChatbotText: false,
-            text: message,
-            tempText: "",
-            type: "text",
-            status: "completed",                 
-          })
-        );
         setTimeout(()=>dispatch(
           addChatItem({
             id: uuid(),

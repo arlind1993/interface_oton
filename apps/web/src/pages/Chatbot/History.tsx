@@ -8,7 +8,7 @@ import moment, { months } from 'moment';
 import { Edit, Trash } from 'ui/src/components/icons';
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
 import { InputContainer, Input } from 'components/Settings/Input';
-import { addHistoryItem, emptyChats, HistoryItem, removeHistoryItem, updateHistoryItem } from 'state/chatbot/reducer';
+import { addHistoryItem, emptyChats, HistoryItem, removeChatItem, removeHistoryItem, updateHistoryItem } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import { v4 as uuid } from 'uuid';
 import { scrollbarStyle } from 'components/SearchModal/CurrencyList/index.css';
@@ -106,13 +106,13 @@ export function timeAgo(inputTime: number) {// inputtime with ms
 
 
 function Chatbot() {
-  const refs = useRef<Array<HTMLInputElement | null>>([]);
+  const refs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const navigation = useNavigate();
 
   const histories = useAppSelector((state) => state.chatbot.histories);
   const dispatch = useAppDispatch();
-  const {chatId} = useParams<{ chatId: string;}>();
+  const {chatId} = useParams<{ chatId: string}>();
 
   const handlePress = useCallback((item?: HistoryItem) => {
     if(item){
@@ -128,16 +128,66 @@ function Chatbot() {
     
   }, [chatId]);
 
-  const renderItem = useCallback((item: HistoryItem, pos: number) => {
-    const handleMouseEnter = () => dispatch(updateHistoryItem({refs, pos, hover: true}));
-    const handleMouseLeave = () => dispatch(updateHistoryItem({refs, pos, hover: false}));
-    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => dispatch(updateHistoryItem({refs, pos, tempName: e.target.value}));
-    const handleEdit = () => dispatch(updateHistoryItem({refs, pos, renaming: true, tempName: item.renaming ? item.tempName : undefined}));
-    const handleSubmit = () => {
-      dispatch(updateHistoryItem({refs, pos, renaming: false, name: item.tempName}));
+  const renderItem = useCallback((item: HistoryItem, id: string) => {
+    const handleMouseEnter = () => {
+      dispatch(
+        updateHistoryItem([
+          {id, item: {hover: true}}
+        ])
+      );
     }
-    const handleCancel = () => dispatch(updateHistoryItem({refs, pos, renaming: false}));
-    const removeItem = () => dispatch(removeHistoryItem({refs, pos}));
+    const handleMouseLeave = () => {
+      dispatch(
+        updateHistoryItem([
+          {id, item: {hover: false}}
+        ])
+      );
+    }
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement>)=>{
+      dispatch(
+        updateHistoryItem([
+          {id, item: {tempName: e.target.value}}
+        ])
+      );
+    }
+    const handleEdit = () => {
+      dispatch(
+        updateHistoryItem([
+          {id, item: {renaming: true, tempName: item.renaming ? item.tempName : item.name}}
+        ])
+      );
+      setTimeout(()=>{
+        refs.current[id]?.focus();
+      });
+    }
+    const handleSubmit = () => {
+      const trimmedMsg = item.tempName.trim();
+      if(trimmedMsg === ""){
+
+      }else{
+        dispatch(
+          updateHistoryItem([
+            {id, item: {renaming: true, name: trimmedMsg, tempName: ""}}
+          ])
+        );
+      }
+    };
+    const handleCancel = () => {
+      dispatch(
+        updateHistoryItem([
+          {id, item:{renaming: false, tempName: ""}}
+        ])
+      );
+    }
+
+    const removeItem = () => {
+      dispatch(
+        removeChatItem({ids: item.chats, historyId: id})
+      );
+      if(id in refs.current){
+        delete refs.current[id];
+      }
+    };
     
     const handleKeyPresses = (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
@@ -146,6 +196,13 @@ function Chatbot() {
         handleCancel();
       }
     };
+
+    const handleBlur = ()=>{
+      setTimeout(()=>{
+        handleCancel()
+      }, 150);
+    }
+
     return (
       <HistoryButton key={item.id}
         onMouseEnter={handleMouseEnter}
@@ -168,16 +225,12 @@ function Chatbot() {
           <TitleContainer
           enabled={item.renaming}>
           <Input
-            ref={(e) => refs.current[pos] = e}
+            ref={(e) => refs.current[id] = e}
             disabled={!item.renaming}
             value={item.renaming ? item.tempName : item.name}
             onKeyDown={handleKeyPresses}
             onChange={handleOnChange}
-            onBlur={(e)=>{
-              setTimeout(()=>{
-                handleCancel()
-              }, 150);
-            }}
+            onBlur={handleBlur}
             style={{ textAlign: 'left', }}
           />
           </TitleContainer>
@@ -220,7 +273,7 @@ function Chatbot() {
         My History
       </SideText>
       <HistoryContainer className={`${scrollbarStyle}`}>
-        {histories.map((item, pos) => renderItem(item, pos))}
+        {Object.entries(histories).map((e) => renderItem(e[1], e[0]))}
       </HistoryContainer>
       
     </Section>
