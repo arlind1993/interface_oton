@@ -11,7 +11,6 @@ import { getExploreTitle } from './getExploreTitle'
 // High-traffic pages (index and /swap) should not be lazy-loaded.
 import Landing from './Landing'
 import Swap from './Swap'
-import Blog from './Blog/Blog'
 
 const NftExplore = lazy(() => import('nft/pages/explore'))
 const Collection = lazy(() => import('nft/pages/collection'))
@@ -145,13 +144,6 @@ export const routes: RouteDefinition[] = [
       <Suspense fallback={null}>
         <PoolDetails />
       </Suspense>
-    ),
-  }),
-  createRouteDefinition({
-    path: '/blog/*',
-    getTitle: () => t`View our latest blogs`,
-    getElement: () => (
-      <Blog/>
     ),
   }),
   createRouteDefinition({

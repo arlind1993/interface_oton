@@ -109,18 +109,17 @@ const ButtonActionSecondary = styled(ButtonSecondary)`
 function ChatSection() {
   const dispatch = useAppDispatch();
   const chats = useAppSelector((state) => state.chatbot.chats);
-  console.log(chats);
   const {chatId} = useParams<{ chatId: string;}>();
   const refs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   const histories = useAppSelector((state) => state.chatbot.histories);
-  console.log(histories);
+  const tempHistory = useAppSelector((state) => state.chatbot.tempHistory);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [chats.length]); //
+  }, [chatId, histories[chatId ?? ""]?.chats.length])
 
 
 
@@ -163,37 +162,24 @@ function ChatSection() {
       }else{
         dispatch(
           updateChatItem([
-            {id, item: {editing: true, text: trimmedMsg, tempText: ""}}
+            {id, item: {editing: false, text: trimmedMsg, tempText: ""}}
           ])
         );
         const removeChats: Array<string> = [];
-        const leftChats: Array<string> = [];
         let after = false;
         if(chatId && chatId in histories){
           for(const cid of histories[chatId].chats){
             if(after){
               removeChats.push(cid);
-            }else{
-              leftChats.push(cid);
             }
             if(id === cid){
               after = true;
             }
           }
-          dispatch(
-            updateHistoryItem([
-              {id, item: {chats: leftChats}}
-            ])
-          )
         }
         dispatch(
           removeChatItem({ids: removeChats, historyId: chatId})
         );
-        for(const cid of removeChats){
-          if(cid in chats){
-            delete chats[cid];
-          }
-        }
       }
     };
     const handleCancel = () => {
@@ -281,14 +267,26 @@ function ChatSection() {
         
       </Chatbox>
     );
-  }, [chats, histories, chatId]);
+  }, [chats, chatId, histories]);
 
-  
+  const chatItems = useCallback(()=>{
+    let chatItems = tempHistory.chats;
+    if(chatId && chatId in histories){
+      chatItems = histories[chatId].chats
+    }
+    const res: Record<string, ChatItem> = {}
+    for(const cid of chatItems){
+      if(cid in chats){
+        res[cid] = chats[cid];
+      }
+    }
+    return Object.entries(res).map((e) => renderItem(e[1], e[0]));
+  },[chats, chatId, histories]); 
 
   return (
     <Section>
       <ChatList className={`${scrollbarStyle}`} ref={(e)=>scrollRef.current = e}>
-        {Object.entries(chats).map((e) => renderItem(e[1], e[0]))}
+        {...chatItems()}
       </ChatList>
       <ChatInput/>
     </Section>

@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef, useState, Fragment, KeyboardEvent, ChangeEvent, useImperativeHandle } from 'react'
+import { memo, useCallback, useRef, useEffect, Fragment, KeyboardEvent, ChangeEvent, useImperativeHandle } from 'react'
 import { Button } from 'rebass';
 import styled from 'styled-components'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -107,25 +107,23 @@ export function timeAgo(inputTime: number) {// inputtime with ms
 
 function Chatbot() {
   const refs = useRef<Record<string, HTMLInputElement | null>>({});
-
   const navigation = useNavigate();
-
   const histories = useAppSelector((state) => state.chatbot.histories);
   const dispatch = useAppDispatch();
   const {chatId} = useParams<{ chatId: string}>();
+
+  useEffect(()=>{
+    if(chatId && !(chatId in histories)){
+      navigation("/chatbot");
+    }
+  },[chatId, histories])
 
   const handlePress = useCallback((item?: HistoryItem) => {
     if(item){
       navigation("/chatbot/"+ item.id);
     }else{
       navigation("/chatbot");
-      if(chatId != null && chatId != undefined){
-        dispatch(emptyChats());
-      }
-      
     }
-
-    
   }, [chatId]);
 
   const renderItem = useCallback((item: HistoryItem, id: string) => {
@@ -167,7 +165,7 @@ function Chatbot() {
       }else{
         dispatch(
           updateHistoryItem([
-            {id, item: {renaming: true, name: trimmedMsg, tempName: ""}}
+            {id, item: {renaming: false, name: trimmedMsg, tempName: ""}}
           ])
         );
       }
@@ -182,7 +180,7 @@ function Chatbot() {
 
     const removeItem = () => {
       dispatch(
-        removeChatItem({ids: item.chats, historyId: id})
+        removeHistoryItem({ids: [id], withChats: true})
       );
       if(id in refs.current){
         delete refs.current[id];

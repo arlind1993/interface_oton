@@ -262,7 +262,6 @@ const Header = memo(function Header() {
   const ChatbotMini = useCallback(()=>{
      return <MiniChatbotContainer opaque={displayChatbot}>
         <ChatButton opened={isChatbotOpened} onClick={()=>{
-          console.log(isChatbotOpened)
           setChatbotOpened(!isChatbotOpened)
         }}>
 
