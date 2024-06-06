@@ -8,7 +8,7 @@ import moment, { months } from 'moment';
 import { Edit, Trash } from 'ui/src/components/icons';
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
 import { InputContainer, Input } from 'components/Settings/Input';
-import { addHistoryItem, emptyChats, HistoryItem, removeChatItem, removeHistoryItem, updateHistoryItem } from 'state/chatbot/reducer';
+import { addHistoryItem, emptyChats, HistoryItem, removeChatItem, removeHistoryItem, resetTempHistory, updateHistoryItem } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import { v4 as uuid } from 'uuid';
 import { scrollbarStyle } from 'components/SearchModal/CurrencyList/index.css';
@@ -123,6 +123,7 @@ function Chatbot() {
       navigation("/chatbot/"+ item.id);
     }else{
       navigation("/chatbot");
+      dispatch(resetTempHistory());
     }
   }, [chatId]);
 
@@ -158,18 +159,18 @@ function Chatbot() {
         refs.current[id]?.focus();
       });
     }
+
     const handleSubmit = () => {
       const trimmedMsg = item.tempName.trim();
-      if(trimmedMsg === ""){
+      if(trimmedMsg === "") return;
 
-      }else{
-        dispatch(
-          updateHistoryItem([
-            {id, item: {renaming: false, name: trimmedMsg, tempName: ""}}
-          ])
-        );
-      }
-    };
+      dispatch(
+        updateHistoryItem([
+          {id, item: {renaming: false, name: trimmedMsg, tempName: ""}}
+        ])
+      )
+    }
+
     const handleCancel = () => {
       dispatch(
         updateHistoryItem([
@@ -271,7 +272,7 @@ function Chatbot() {
         My History
       </SideText>
       <HistoryContainer className={`${scrollbarStyle}`}>
-        {Object.entries(histories).map((e) => renderItem(e[1], e[0]))}
+        {Object.entries(histories).filter(e => e[0] != "temp").map((e) => renderItem(e[1], e[0]))}
       </HistoryContainer>
       
     </Section>

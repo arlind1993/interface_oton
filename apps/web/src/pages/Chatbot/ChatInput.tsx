@@ -50,7 +50,7 @@ function ChatInput(){
     const [input, setInput] = useState<string>("");
     const isInChatbot = useIsChatbotPage();
     const chats = useAppSelector((state) => state.chatbot.chats);
-    const tempHistory = useAppSelector((state) => state.chatbot.tempHistory);
+    const histories = useAppSelector((state) => state.chatbot.histories);
     const dispatch = useAppDispatch();
     const {chatId} = useParams<{chatId: string}>();
 
@@ -59,6 +59,23 @@ function ChatInput(){
       if(message == "") return; 
       setInput("");
       const userCid = uuid();
+      const botCid = uuid();
+      let historyId: string | null = null;
+      if(isInChatbot && !chatId){
+        historyId = uuid();
+        dispatch(
+          addHistoryItem({items:[{
+            id: historyId,
+            hover: false,
+            name: message.split(" ")[0],
+            tempName: "",
+            renaming: false,
+            timestamp: Date.now(),
+            chats: [...histories["temp"].chats]
+          }]})
+        );
+        navigator("/chatbot/"+historyId);
+      }
       dispatch(
         addChatItem({items: [{
           id: userCid,
@@ -69,85 +86,69 @@ function ChatInput(){
           tempText: "",
           type: "text",
           status: "completed",                 
-        }], historyId: chatId})
+        }], historyId: historyId ?? chatId ?? "temp"})
       );
-      if(isInChatbot && !chatId){
-          const historyId = uuid();
-          dispatch(
-            addHistoryItem({items:[{
-              id: historyId,
-              hover: false,
-              name: message.split(" ")[0],
-              tempName: "",
-              renaming: false,
-              timestamp: Date.now(),
-              chats: [...tempHistory.chats, userCid]
-            }]})
-          );
-          navigator("/chatbot/"+historyId);
-        }
-        const botCid = uuid();
-        setTimeout(()=>dispatch(
-          addChatItem({items:[{
-            id: botCid,
-            hover: false,
-            editing: false,
-            isChatbotText: true,
-            text: "Providing an answer...",
-            tempText: "",
-            type: "text",
-            status: "sending",                 
-          }],historyId: chatId})
-        ), 100)
+      setTimeout(()=>dispatch(
+        addChatItem({items:[{
+          id: botCid,
+          hover: false,
+          editing: false,
+          isChatbotText: true,
+          text: "Providing an answer...",
+          tempText: "",
+          type: "text",
+          status: "sending",                 
+        }],historyId: historyId ?? chatId ?? "temp"})
+      ), 100)
 
-        console.log(message);
-        witBotSendMessage(message).then((res)=>{
-          let message = "";
-          if(res.error){
-            message = "No response, Connection failed";
-            dispatch(
-              updateChatItem([{
-                id: botCid,
-                item:{
-                  status: "failed",
-                  text: message,
-                }
-              }])
-            );
-          }else if(res.success){
-            let intent: {value: string, confidence: number}| null = null;
-            let entities: ({value: string, name: string, role?: string, confidence: number})[] = [];
-            if(res.success.intents && res.success.intents.length > 0){
-              intent = {
-                value: res.success.intents[0].name,
-                confidence: res.success.intents[0].confidence,
-              };
-            }
-            if(res.success.entities){
-              Object.values(res.success.entities).forEach(e=> {
-                e.forEach(e=>{
-                  entities.push({
-                    confidence: e.confidence,
-                    value: e.value,
-                    name: e.name,
-                    role: e.role,
-                  })
-                })  
-              });
-            }
-            message = translateToMessage(intent, entities);
-            dispatch(
-              updateChatItem([{
-                id: botCid,
-                item:{
-                  status: "completed",
-                  text: message,
-                }
-              }])
-            );
+      console.log(message);
+      witBotSendMessage(message).then((res)=>{
+        let message = "";
+        if(res.error){
+          message = "No response, Connection failed";
+          dispatch(
+            updateChatItem([{
+              id: botCid,
+              item:{
+                status: "failed",
+                text: message,
+              }
+            }])
+          );
+        }else if(res.success){
+          let intent: {value: string, confidence: number}| null = null;
+          let entities: ({value: string, name: string, role?: string, confidence: number})[] = [];
+          if(res.success.intents && res.success.intents.length > 0){
+            intent = {
+              value: res.success.intents[0].name,
+              confidence: res.success.intents[0].confidence,
+            };
           }
-        })
-    }, [chats]);
+          if(res.success.entities){
+            Object.values(res.success.entities).forEach(e=> {
+              e.forEach(e=>{
+                entities.push({
+                  confidence: e.confidence,
+                  value: e.value,
+                  name: e.name,
+                  role: e.role,
+                })
+              })  
+            });
+          }
+          message = translateToMessage(intent, entities);
+          dispatch(
+            updateChatItem([{
+              id: botCid,
+              item:{
+                status: "completed",
+                text: message,
+              }
+            }])
+          );
+        }
+      })
+    }, [chats, histories, chatId]);
 
 
     return (

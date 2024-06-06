@@ -31,23 +31,22 @@ export interface OptionsItem {
 }
 
 export interface ChatbotState {
-  tempHistory: HistoryItem
   histories: Record<string, HistoryItem>
   chats: Record<string, ChatItem>
 }
 const initialState: ChatbotState = {
-  tempHistory: {
-    id: "temp",
-    name: "Rename title",
-    tempName: "",
-    timestamp: 0,
-    hover: false,
-    renaming: false,
-    chats:  ["1"]
-  },
   histories: {
-    "3": {
-      id: "3",
+    "temp": {
+      id: "temp",
+      name: "Rename title",
+      tempName: "",
+      timestamp: 0,
+      hover: false,
+      renaming: false,
+      chats:  ["1"]
+    },
+    "11110000-0000-0000-0000-000011110000": {
+      id: "11110000-0000-0000-0000-000011110000",
       name: "Buy Crypto",
       tempName: "",
       timestamp: 1714990242000,
@@ -55,8 +54,8 @@ const initialState: ChatbotState = {
       renaming: false,
       chats: ["1"]
     },
-    "5": {
-      id: "5",
+    "22220000-0000-0000-0000-000022220000": {
+      id: "22220000-0000-0000-0000-000022220000",
       name: "What is OTON",
       tempName: "",
       timestamp: 1713607842000,
@@ -64,8 +63,8 @@ const initialState: ChatbotState = {
       renaming: false,
       chats: ["1"]
     },
-    "10": {
-      id: "10",
+    "33330000-0000-0000-0000-000033330000": {
+      id: "33330000-0000-0000-0000-000033330000",
       name: "Connect wallet",
       tempName: "",
       timestamp: 1716199842000,
@@ -126,20 +125,6 @@ const walletsSlice = createSlice({
   name: 'chatbot',
   initialState,
   reducers: {
-    resetTempHistory(state){
-      updateTempHistory({
-        id: "temp",
-        name: "Rename title",
-        tempName: "",
-        timestamp: 0,
-        hover: false,
-        renaming: false,
-        chats:  ["1"]
-      })
-    },
-    updateTempHistory(state, {payload}: PayloadAction<Partial<HistoryItem>>){
-      Object.assign(state.tempHistory, payload)
-    },
     addHistoryItem(state, { payload: {items} }: PayloadAction<{items: Array<HistoryItem>}>) {
       console.log("addHistoryItem", items);
       for(const item of items){
@@ -177,6 +162,21 @@ const walletsSlice = createSlice({
         }
       }
     },
+    resetTempHistory(state){
+      console.log("resetTempHistory");
+      const item = {
+        id: "temp",
+        name: "Rename title",
+        tempName: "",
+        timestamp: 0,
+        hover: false,
+        renaming: false,
+        chats:  ["1"]
+      };
+      if(state.histories["temp"]){
+        Object.assign(state.histories["temp"], item);
+      }
+    },
     emptyChats(state){
       state.chats = {}
     },
@@ -188,14 +188,18 @@ const walletsSlice = createSlice({
       for(const id of ids){
         if (id in state.histories) {
           if(withChats){
-            removeChatItem({ids: state.histories[id].chats});
+            for(const cid of state.histories[id].chats){
+              if ((cid in state.chats) && cid !== "1") {
+                delete state.chats[cid];
+              }
+            }
           }
           delete state.histories[id];
         }
       }
     },
-    removeChatItem(state, {payload: {ids, historyId}}:PayloadAction<{ids: Array<string>, historyId?: string}>){  
-      console.log("removeChatItem", ids, historyId);
+    removeChatItem(state, {type, payload: {ids, historyId}}:PayloadAction<{ids: Array<string>, historyId?: string}>){  
+      console.log("removeChatItem", ids, historyId, type);
       for(const id of ids){
         if ((id in state.chats) && id !== "1") {
           delete state.chats[id];
@@ -218,7 +222,6 @@ export const {
   removeChatItem, 
   emptyChats,
   emptyHistories,
-  updateTempHistory,
   resetTempHistory,
 } = walletsSlice.actions
 export default walletsSlice.reducer

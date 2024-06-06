@@ -9,10 +9,13 @@ import { InputContainer, Input } from 'components/Settings/Input';
 import { ResizingTextArea } from 'components/TextInput';
 import { scrollbarStyle } from '../../components/SearchModal/CurrencyList/index.css';
 import {Botkit} from "botkit";
-import { ChatItem, removeChatItem, removeHistoryItem, updateChatItem, updateHistoryItem } from 'state/chatbot/reducer';
+import { addChatItem, ChatItem, removeChatItem, removeHistoryItem, updateChatItem, updateHistoryItem } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import ChatInput from './ChatInput';
 import { useParams } from 'react-router-dom';
+import { witBotSendMessage } from './req';
+import { translateToMessage } from './handleMessage';
+import { v4 as uuid } from 'uuid';
 
 
 
@@ -112,7 +115,6 @@ function ChatSection() {
   const {chatId} = useParams<{ chatId: string;}>();
   const refs = useRef<Record<string, HTMLTextAreaElement | null>>({});
   const histories = useAppSelector((state) => state.chatbot.histories);
-  const tempHistory = useAppSelector((state) => state.chatbot.tempHistory);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -157,30 +159,101 @@ function ChatSection() {
     }
     const handleSubmit = () => {
       const trimmedMsg = item.tempText.trim();
-      if(trimmedMsg === ""){
-
-      }else{
-        dispatch(
-          updateChatItem([
-            {id, item: {editing: false, text: trimmedMsg, tempText: ""}}
-          ])
-        );
-        const removeChats: Array<string> = [];
-        let after = false;
-        if(chatId && chatId in histories){
-          for(const cid of histories[chatId].chats){
-            if(after){
-              removeChats.push(cid);
-            }
-            if(id === cid){
-              after = true;
-            }
-          }
-        }
-        dispatch(
-          removeChatItem({ids: removeChats, historyId: chatId})
-        );
+      if(trimmedMsg === "") return;
+      dispatch(
+        updateChatItem([
+          {id, item: {editing: false, text: trimmedMsg, tempText: ""}}
+        ])
+      );
+      let hcids: Array<string> = [];
+      const removeChats: Array<string> = [];
+      let after = false;
+      if("temp" in histories){
+        hcids = histories["temp"].chats;
       }
+      if(chatId && chatId in histories){
+        hcids = histories[chatId].chats;
+      }
+
+      for(const cid of hcids){
+          
+        console.log("removeChats", removeChats, id, cid, after);
+        if(after){
+          removeChats.push(cid);
+        }
+        if(id === cid){
+          after = true;
+        }
+        console.log("removeChats", removeChats);
+      }
+
+      dispatch(
+        removeChatItem({ids: removeChats, historyId: chatId ?? "temp"})
+      );
+      
+      const botCid = uuid();
+      setTimeout(()=>dispatch(
+        addChatItem({items:[{
+          id: botCid,
+          hover: false,
+          editing: false,
+          isChatbotText: true,
+          text: "Providing an answer...",
+          tempText: "",
+          type: "text",
+          status: "sending",                 
+        }],historyId: chatId ?? "temp"})
+      ), 100)
+
+      console.log(trimmedMsg);
+      witBotSendMessage(trimmedMsg).then((res)=>{
+        let message = "";
+        if(res.error){
+          message = "No response, Connection failed";
+          dispatch(
+            updateChatItem([{
+              id: botCid,
+              item:{
+                status: "failed",
+                text: message,
+              }
+            }])
+          );
+        }else if(res.success){
+          let intent: {value: string, confidence: number}| null = null;
+          let entities: ({value: string, name: string, role?: string, confidence: number})[] = [];
+          if(res.success.intents && res.success.intents.length > 0){
+            intent = {
+              value: res.success.intents[0].name,
+              confidence: res.success.intents[0].confidence,
+            };
+          }
+          if(res.success.entities){
+            Object.values(res.success.entities).forEach(e=> {
+              e.forEach(e=>{
+                entities.push({
+                  confidence: e.confidence,
+                  value: e.value,
+                  name: e.name,
+                  role: e.role,
+                })
+              })  
+            });
+          }
+          message = translateToMessage(intent, entities);
+          dispatch(
+            updateChatItem([{
+              id: botCid,
+              item:{
+                status: "completed",
+                text: message,
+              }
+            }])
+          );
+        }
+      })
+
+
     };
     const handleCancel = () => {
       dispatch(
@@ -270,7 +343,11 @@ function ChatSection() {
   }, [chats, chatId, histories]);
 
   const chatItems = useCallback(()=>{
-    let chatItems = tempHistory.chats;
+    let chatItems: Array<string> = [];
+    
+    if("temp" in histories){
+      chatItems = histories["temp"].chats;
+    }
     if(chatId && chatId in histories){
       chatItems = histories[chatId].chats
     }
