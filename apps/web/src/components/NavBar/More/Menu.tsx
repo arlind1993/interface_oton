@@ -124,7 +124,7 @@ export function Menu({ close }: { close: () => void }) {
           <MobileAppLogo />
           <Column gap="xs">
             <Text lineHeight="20px">
-              <Trans>Download Uniswap</Trans>
+              <Trans>Download Oton</Trans>
             </Text>
             <ThemedText.LabelSmall lineHeight="18px">
               <Trans>Available on iOS and Android</Trans>

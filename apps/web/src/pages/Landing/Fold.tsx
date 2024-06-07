@@ -10,7 +10,7 @@ const Fold = forwardRef<HTMLDivElement>(function Fold(props, scrollAnchor) {
       <div ref={scrollAnchor}>
         <DirectToDefi />
       </div>
-      <Stats />
+      {/* <Stats /> */}
       <NewsletterEtc />
       <Footer />
     </>

@@ -29,7 +29,7 @@ export function SwitchLocaleLink() {
 
   return (
     <Text fontSize={11} opacity={0.6} hoverStyle={{ opacity: 1 }} mt="1rem">
-      <Trans>Uniswap available in: </Trans>
+      <Trans>Oton available in: </Trans>
       <StyledInternalLink onClick={onClick} to={to}>
         {LOCALE_LABEL[targetLocale]}
       </StyledInternalLink>

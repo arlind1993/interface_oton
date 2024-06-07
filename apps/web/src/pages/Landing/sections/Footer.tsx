@@ -128,18 +128,18 @@ export function Footer() {
                 <Body1>
                   <Trans>Company</Trans>
                 </Body1>
-                <StyledExternalLink href="/blog">
+                <StyledInternalLink to="https://blog.oton.ai">
                   <Trans>Blog</Trans>
-                </StyledExternalLink>
-                <StyledExternalLink href="/">
+                </StyledInternalLink>
+                <StyledInternalLink to="/">
                   <Trans>Developers</Trans>
-                </StyledExternalLink>
+                </StyledInternalLink>
               </Box>
               <Box direction="column" gap="10px">
                 <Body1>
                   <Trans>Need help?</Trans>
                 </Body1>
-                <StyledExternalLink href="/">
+                <StyledExternalLink href="/contact">
                   <Trans>Contact us</Trans>
                 </StyledExternalLink>
                 <StyledExternalLink href="/">

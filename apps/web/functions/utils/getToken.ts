@@ -8,12 +8,12 @@ import client from '../client'
 
 function formatTitleName(symbol: string | undefined, name: string | undefined) {
   if (symbol) {
-    return 'Get ' + symbol + ' on Uniswap'
+    return 'Get ' + symbol + ' on Oton'
   }
   if (name) {
-    return 'Get ' + name + ' on Uniswap'
+    return 'Get ' + name + ' on Oton'
   }
-  return 'View Token on Uniswap'
+  return 'View Token on Oton'
 }
 
 const convertTokenAddress = (networkName: string, tokenAddress: string) => {

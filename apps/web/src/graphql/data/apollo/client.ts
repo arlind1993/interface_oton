@@ -16,9 +16,6 @@ export const apolloClient = new ApolloClient({
   connectToDevTools: true,
   link: httpLink,
   headers: {
-    "Access-Control-Allow-Headers" : "Content-Type",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
     'Content-Type': 'application/json',
     Origin: 'https://app.uniswap.org',
   },

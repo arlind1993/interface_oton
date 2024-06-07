@@ -121,27 +121,27 @@ export function NewsletterEtc() {
       <Box direction="row" maxWidth="1328px" gap="24px" width="100%">
         <SectionCol justify-content="space-between" height="100%">
           <H2>
-            <Trans>Connect with us</Trans>
+            <Trans>Get informed</Trans>
           </H2>
           <Layout>
             <HelpCenterCard
               initial="initial"
               whileHover="hover"
-              href="https://help.uniswap.org/"
-              target="_blank"
+              href="/chatbot"
+              target="_self"
               rel="noopener noreferrer"
               backgroundColor={isDarkMode ? 'rgba(255, 77, 0, 0.08)' : 'rgba(255, 77, 0, 0.04)'}
             >
               <PillButton icon={<HelpCircle fill={helpPrimary} />} color={helpPrimary} label={t`Help Center`} />
               <H3 color={helpPrimary}>
-                <Trans>Get support</Trans>
+                <Trans>Ask our bot for anything</Trans>
               </H3>
             </HelpCenterCard>
             <BlogCard
               initial="initial"
               whileHover="hover"
-              href="https://blog.uniswap.org/"
-              target="_blank"
+              href="https://blog.oton.ai"
+              target="_self"
               rel="noopener noreferrer"
               backgroundColor={isDarkMode ? 'rgba(98, 84, 50, 0.16)' : 'rgba(98, 84, 50, 0.04)'}
             >
@@ -154,7 +154,7 @@ export function NewsletterEtc() {
               backgroundColor={theme.accent2}
               initial="initial"
               whileHover="hover"
-              href="https://twitter.com/Uniswap/"
+              href="https://twitter.com/oton/"
               target="_blank"
               rel="noopener noreferrer"
             >
