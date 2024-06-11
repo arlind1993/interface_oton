@@ -16,6 +16,7 @@ export interface ChatItem {
   text: string
   tempText: string
   type: string
+  typeData?: any
   isChatbotText: boolean
   status: string
   hover: boolean
@@ -24,9 +25,9 @@ export interface ChatItem {
 }
 
 export interface OptionsItem {
-  id: number
+  id: string
   text: string
-  href: string
+  href?: string
   selected: false
 }
 
@@ -100,8 +101,8 @@ const initialState: ChatbotState = {
       tempText: "",
       type: "options",
       options: [
-        {id: 1, text: "Go to main", href: "/", selected: false},
-        {id: 2, text: "Go to explore", href: "/explore", selected: false},
+        {id: "1", text: "Go to main", href: "/", selected: false},
+        {id: "2", text: "Go to explore", href: "/explore", selected: false},
       ],
       isChatbotText: true,
       hover: false,
@@ -126,13 +127,13 @@ const walletsSlice = createSlice({
   initialState,
   reducers: {
     addHistoryItem(state, { payload: {items} }: PayloadAction<{items: Array<HistoryItem>}>) {
-      console.log("addHistoryItem", items);
+      // console.log("addHistoryItem", items);
       for(const item of items){
         state.histories[item.id] = item
       }
     },
     addChatItem(state, { payload: {items, historyId} }: PayloadAction<{items: Array<ChatItem>, historyId?: string}>) {
-      console.log("addChatItem", items);
+      // console.log("addChatItem", items);
       for(const item of items){
         state.chats[item.id] = item
       }
@@ -144,7 +145,7 @@ const walletsSlice = createSlice({
       id: string,
       item: Partial<ChatItem>
     }>>) {
-      console.log("updateChatItem", payload);
+      // console.log("updateChatItem", payload);
       for(const {id, item} of payload){
         if(state.chats[id]){
           Object.assign(state.chats[id], item);
@@ -155,7 +156,7 @@ const walletsSlice = createSlice({
       item: Partial<HistoryItem>, 
       id: string,
     }>>) {
-      console.log("updateHistoryItem", payload);
+      // console.log("updateHistoryItem", payload);
       for(const {id, item} of payload){
         if(state.histories[id]){
           Object.assign(state.histories[id], item);
@@ -163,7 +164,7 @@ const walletsSlice = createSlice({
       }
     },
     resetTempHistory(state){
-      console.log("resetTempHistory");
+      // console.log("resetTempHistory");
       const item = {
         id: "temp",
         name: "Rename title",
@@ -184,7 +185,7 @@ const walletsSlice = createSlice({
       state.histories = {}
     },
     removeHistoryItem(state, {payload: {ids, withChats}}:PayloadAction<{ids: Array<string>, withChats: boolean}>){
-      console.log("removeHistoryItem", ids, withChats);
+      // console.log("removeHistoryItem", ids, withChats);
       for(const id of ids){
         if (id in state.histories) {
           if(withChats){
@@ -199,7 +200,7 @@ const walletsSlice = createSlice({
       }
     },
     removeChatItem(state, {type, payload: {ids, historyId}}:PayloadAction<{ids: Array<string>, historyId?: string}>){  
-      console.log("removeChatItem", ids, historyId, type);
+      // console.log("removeChatItem", ids, historyId, type);
       for(const id of ids){
         if ((id in state.chats) && id !== "1") {
           delete state.chats[id];

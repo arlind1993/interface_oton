@@ -55,7 +55,8 @@ export function useCurrencySearchResults({
 
   /**
    * GraphQL queries for tokens and search results
-   */
+  //  */
+  // console.log('searchQuerrrrrry', searchQuery)
   const { data: searchResults, loading: searchResultsLoading } = useSearchTokensWebQuery({
     variables: {
       searchQuery: searchQuery ?? '',

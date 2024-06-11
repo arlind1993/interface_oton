@@ -45,7 +45,7 @@ export interface CurrencySearchFilters {
   onlyShowCurrenciesWithBalance?: boolean
 }
 
-const DEFAULT_CURRENCY_SEARCH_FILTERS: CurrencySearchFilters = {
+export const DEFAULT_CURRENCY_SEARCH_FILTERS: CurrencySearchFilters = {
   showCommonBases: true,
   disableNonToken: false,
   onlyShowCurrenciesWithBalance: false,
@@ -94,6 +94,9 @@ export function CurrencySearch({
     selectedCurrency,
     otherSelectedCurrency,
   })
+
+
+  console.log("COINSSSSSS", searchCurrency, allCurrencyRows, currencySearchResultsLoading);
 
   const { balanceMap } = useTokenBalances()
 

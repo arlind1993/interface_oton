@@ -33,7 +33,7 @@ function mergeConnections(connections: Connection[], eip6963Connections: Connect
   const allConnections = [...displayedConnections.filter((c) => c.type !== ConnectionType.INJECTED)]
   // By default, injected options should appear second in the list (below Uniswap wallet)
   allConnections.splice(1, 0, ...eip6963Connections)
-
+  console.log('Allle', allConnections);
   return allConnections
 }
 
@@ -71,6 +71,7 @@ export function useOrderedConnections(excludeUniswapConnections?: boolean) {
   const recentConnection = useAppSelector((state) => state.user.recentConnectionMeta)
   const orderedConnections = useMemo(() => {
     const allConnections = mergeConnections(connections, eip6963Connections)
+
     return getOrderedConnections(allConnections, recentConnection, excludeUniswapConnections ?? false)
   }, [eip6963Connections, excludeUniswapConnections, recentConnection])
 

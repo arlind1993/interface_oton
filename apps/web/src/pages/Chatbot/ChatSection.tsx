@@ -14,8 +14,9 @@ import { useAppDispatch, useAppSelector } from 'state/hooks';
 import ChatInput from './ChatInput';
 import { useParams } from 'react-router-dom';
 import { witBotSendMessage } from './req';
-import { translateToMessage } from './handleMessage';
 import { v4 as uuid } from 'uuid';
+import { FullMessage, translateToMessage } from './hooks';
+import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks';
 
 
 
@@ -192,7 +193,8 @@ function ChatSection() {
       );
       
       const botCid = uuid();
-      setTimeout(()=>dispatch(
+      console.log("add");
+      dispatch(
         addChatItem({items:[{
           id: botCid,
           hover: false,
@@ -203,51 +205,30 @@ function ChatSection() {
           type: "text",
           status: "sending",                 
         }],historyId: chatId ?? "temp"})
-      ), 100)
+      )
 
-      console.log(trimmedMsg);
-      witBotSendMessage(trimmedMsg).then((res)=>{
-        let message = "";
+      witBotSendMessage(trimmedMsg).then(async(res)=>{
+        let fullMessage: FullMessage = {
+          text: "",
+          type: "text",
+        };
         if(res.error){
-          message = "No response, Connection failed";
+          fullMessage.text = "No response, Connection failed";
+          fullMessage.status = "failed";
           dispatch(
             updateChatItem([{
               id: botCid,
-              item:{
-                status: "failed",
-                text: message,
-              }
+              item: fullMessage
             }])
           );
         }else if(res.success){
-          let intent: {value: string, confidence: number}| null = null;
-          let entities: ({value: string, name: string, role?: string, confidence: number})[] = [];
-          if(res.success.intents && res.success.intents.length > 0){
-            intent = {
-              value: res.success.intents[0].name,
-              confidence: res.success.intents[0].confidence,
-            };
-          }
-          if(res.success.entities){
-            Object.values(res.success.entities).forEach(e=> {
-              e.forEach(e=>{
-                entities.push({
-                  confidence: e.confidence,
-                  value: e.value,
-                  name: e.name,
-                  role: e.role,
-                })
-              })  
-            });
-          }
-          message = translateToMessage(intent, entities);
+          fullMessage = await translateToMessage(res.success, Object.values(Chain));
+          fullMessage.status = "completed"
+          console.log("fullMessagecs", fullMessage)
           dispatch(
             updateChatItem([{
               id: botCid,
-              item:{
-                status: "completed",
-                text: message,
-              }
+              item: fullMessage
             }])
           );
         }

@@ -25,5 +25,5 @@ module.exports = {
       rules: {},
     },
   ],
-  rules: {},
+  rules: {'prettier/prettier': 0},
 }
