@@ -1,11 +1,6 @@
-import { useAccountDrawer } from "components/AccountDrawer/MiniPortfolio/hooks";
 import { OptionsItem } from "state/chatbot/reducer";
 import { v4 as uuid } from 'uuid';
-import { MessageSuccess } from "./req";
-import useDebounce from "hooks/useDebounce";
-import { isAddress } from "utilities/src/addresses";
 import { useCurrencySearchResults } from "components/SearchModal/useCurrencySearchResults";
-import { useCallback, useEffect, useState } from "react";
 import { DEFAULT_CURRENCY_SEARCH_FILTERS } from "components/SearchModal/CurrencySearch";
 
 export interface FullMessage{

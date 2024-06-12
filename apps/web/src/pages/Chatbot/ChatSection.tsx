@@ -13,7 +13,7 @@ import { addChatItem, ChatItem, removeChatItem, removeHistoryItem, updateChatIte
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import ChatInput from './ChatInput';
 import { useParams } from 'react-router-dom';
-import { witBotSendMessage } from './req';
+import { witBotSendMessage } from './request';
 import { v4 as uuid } from 'uuid';
 import { FullMessage, translateToMessage } from './hooks';
 import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks';

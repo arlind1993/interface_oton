@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from "state/hooks";
 import styled from 'styled-components'
 import { Share } from "ui/src/components/icons";
 import { v4 as uuid } from 'uuid';
-import { witBotSendMessage, } from './req';
+import { witBotSendMessage, } from './request';
 import { FullMessage, translateToMessage} from "./hooks";
 import { Chain } from "uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks";
 

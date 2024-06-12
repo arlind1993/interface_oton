@@ -1,15 +1,53 @@
-import { useAccountDrawer } from "components/AccountDrawer/MiniPortfolio/hooks";
 import { OptionsItem } from "state/chatbot/reducer";
 import { v4 as uuid } from 'uuid';
-import { MessageSuccess } from "./req";
-import useDebounce from "hooks/useDebounce";
-import { isAddress } from "utilities/src/addresses";
-import { useCurrencySearchResults } from "components/SearchModal/useCurrencySearchResults";
-import { useCallback, useEffect, useState } from "react";
-import { DEFAULT_CURRENCY_SEARCH_FILTERS } from "components/SearchModal/CurrencySearch";
-import { CurrencyListRow } from "components/SearchModal/CurrencyList";
-import { Chain, SearchTokensQuery } from "uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks";
+import { MessageSuccess } from "./request";
+import { Chain, Currency, SafetyLevel, SearchTokensWebQuery, TokenStandard } from "uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks";
 import { getTokensFromSearchQuery } from "./request";
+
+type MyToken = {
+    __typename?: "Token" | undefined;
+    id: string;
+    decimals?: number | undefined;
+    name?: string | undefined;
+    chain: Chain;
+    standard?: TokenStandard | undefined;
+    address?: string | undefined;
+    symbol?: string | undefined;
+    market?: {
+        __typename?: 'TokenMarket', 
+        id: string, 
+        price?: { 
+            __typename?: 'Amount', 
+            id: string, 
+            value: number, 
+            currency?: Currency | undefined 
+        } | undefined, 
+        pricePercentChange?: { 
+            __typename?: 'Amount', 
+            id: string, 
+            value: number 
+        } | undefined, 
+        volume24H?: { 
+            __typename?: 'Amount', 
+            id: string, 
+            value: number, 
+            currency?: Currency | undefined 
+        } | undefined 
+    } | undefined;
+    project?: {
+        __typename?: 'TokenProject', 
+        id: string, 
+        name?: string | undefined, 
+        safetyLevel?: SafetyLevel | undefined, 
+        logoUrl?: string | undefined, 
+        isSpam?: boolean | undefined, 
+        logo?: { 
+            __typename?: 'Image', 
+            id: string, 
+            url: string 
+        } | undefined 
+    } | undefined;
+}
 
 export interface FullMessage{
     text: string
@@ -30,18 +68,24 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
             case "greetings": 
                 return "Hello to you as well, How can I help you?";
             case "coin_info":
+                let tokenInfo: SearchTokensWebQuery| undefined;
                 for(const el of data.entities){
                     if(el.name == "crypto_coin"){
-                        let res = await getTokensFromSearchQuery({
+                        const res = await getTokensFromSearchQuery({
                             chains: chains,
                             searchQuery: el.value
                         });
                         if(res.searchTokens) {
-                            console.log("Value", res.searchTokens[0]);
+                            tokenInfo = res;
+                            break;
                         }
                     }
                 }
-                return "";
+                if(tokenInfo){
+                    return resForCoins("single", tokenInfo, undefined, Chain.Ethereum);
+                }else{
+                    return "No coin could be found please try another coin!";
+                }
             case "connect_wallet": 
                 if(true){
 
@@ -82,4 +126,102 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
         if(typeof res === 'object') return res as FullMessage;
         return {text: res as string, type: "text"};
     });
+}
+export const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: SearchTokensWebQuery, recommendedChain?: Chain): FullMessage => {
+    console.log(type, tokensFrom, tokensTo, recommendedChain);
+    if(type == "double" && tokensTo){
+        const getFrom: Record<string, MyToken>  = {}
+        const res : Record<string, {
+            from: MyToken,
+            to: MyToken
+        }> = {};
+        for(const from of tokensFrom.searchTokens!){
+            if(from?.chain){
+                if(!getFrom[from!.chain]){
+                    getFrom[from!.chain] = from;
+                    break;
+                }   
+            }
+        }
+        for(const to of tokensTo.searchTokens!){
+            if(to?.chain){
+                for(const [key, val] of Object.entries(getFrom)){
+                    if(key == to!.chain){
+                        res[key] = {
+                            from: val,
+                            to: to
+                        };
+                        break;
+                    }
+                }
+            }
+        }
+        const result: {
+            data?: {
+                from: MyToken,
+                to: MyToken,  
+            }
+            chain?: string
+         } = {};
+        if(recommendedChain && res[recommendedChain]){
+            result.data = res[recommendedChain];
+            result.chain = recommendedChain;
+        }else {
+            const e = Object.entries(res);
+            if(e.length > 0){
+                result.data = e[0][1];
+                result.chain = e[0][0];
+            }
+        }
+
+        if(result.data){
+            return {
+                text: "Here are the details of the trade from "+ result.data.from.name +" to "+ result.data.to.name +"!",
+                type: "coin_details",
+                typeData: result
+            }
+        }else{
+            return {
+                text: "Could not identify the type of coin. Please try another coin to get their details",
+                type: "text",
+            }
+        }
+    }else{
+        const res: Record<string, MyToken>  = {}
+        for(const from of tokensFrom.searchTokens!){
+            if(from?.chain){
+                if(!res[from!.chain]){
+                    res[from!.chain] = from;
+                    break;
+                }   
+            }
+        }
+        const result: {
+           data?: MyToken
+           chain?: string
+        } = {};
+        if(recommendedChain && res[recommendedChain]){
+            result.data = res[recommendedChain];
+            result.chain
+        }else {
+            const e = Object.entries(res);
+            if(e.length > 0){
+                result.data = e[0][1];
+                result.chain = e[0][0];
+            }
+        }
+        if(result.data){
+            return {
+                text: "Here are the details of "+ result.data.name +"!",
+                type: "coin_details",
+                typeData: result
+            }
+        }else{
+            return {
+                text: "Could not identify the type of coin. Please try another coin to get their details",
+                type: "text",
+            }
+        }
+    }
+    
 }
