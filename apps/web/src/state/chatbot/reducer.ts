@@ -1,6 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { MutableRefObject } from 'react';
-// import { shallowEqual } from 'react-redux'
 
 export interface HistoryItem {
   id: string
@@ -199,7 +197,7 @@ const walletsSlice = createSlice({
         }
       }
     },
-    removeChatItem(state, {type, payload: {ids, historyId}}:PayloadAction<{ids: Array<string>, historyId?: string}>){  
+    removeChatItem(state, {payload: {ids, historyId}}:PayloadAction<{ids: Array<string>, historyId?: string}>){  
       // console.log("removeChatItem", ids, historyId, type);
       for(const id of ids){
         if ((id in state.chats) && id !== "1") {
@@ -221,8 +219,8 @@ export const {
   updateHistoryItem, 
   removeHistoryItem,
   removeChatItem, 
-  emptyChats,
-  emptyHistories,
+  // emptyChats,
+  // emptyHistories,
   resetTempHistory,
 } = walletsSlice.actions
 export default walletsSlice.reducer

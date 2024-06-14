@@ -5,48 +5,48 @@ import { Chain, Currency, SafetyLevel, SearchTokensWebQuery, TokenStandard } fro
 import { getTokensFromSearchQuery } from "./request";
 
 type MyToken = {
-    __typename?: "Token" | undefined;
+    __typename?: "Token";
     id: string;
-    decimals?: number | undefined;
-    name?: string | undefined;
+    decimals?: number;
+    name?: string;
     chain: Chain;
-    standard?: TokenStandard | undefined;
-    address?: string | undefined;
-    symbol?: string | undefined;
+    standard?: TokenStandard;
+    address?: string;
+    symbol?: string;
     market?: {
-        __typename?: 'TokenMarket', 
-        id: string, 
-        price?: { 
-            __typename?: 'Amount', 
-            id: string, 
-            value: number, 
-            currency?: Currency | undefined 
-        } | undefined, 
-        pricePercentChange?: { 
-            __typename?: 'Amount', 
-            id: string, 
-            value: number 
-        } | undefined, 
-        volume24H?: { 
-            __typename?: 'Amount', 
-            id: string, 
-            value: number, 
-            currency?: Currency | undefined 
-        } | undefined 
-    } | undefined;
+        __typename?: 'TokenMarket',
+        id: string,
+        price?: {
+            __typename?: 'Amount',
+            id: string,
+            value: number,
+            currency?: Currency
+        },
+        pricePercentChange?: {
+            __typename?: 'Amount',
+            id: string,
+            value: number
+        },
+        volume24H?: {
+            __typename?: 'Amount',
+            id: string,
+            value: number,
+            currency?: Currency
+        }
+    };
     project?: {
-        __typename?: 'TokenProject', 
-        id: string, 
-        name?: string | undefined, 
-        safetyLevel?: SafetyLevel | undefined, 
-        logoUrl?: string | undefined, 
-        isSpam?: boolean | undefined, 
-        logo?: { 
-            __typename?: 'Image', 
-            id: string, 
-            url: string 
-        } | undefined 
-    } | undefined;
+        __typename?: 'TokenProject',
+        id: string,
+        name?: string,
+        safetyLevel?: SafetyLevel,
+        logoUrl?: string,
+        isSpam?: boolean,
+        logo?: {
+            __typename?: 'Image',
+            id: string,
+            url: string
+        }
+    };
 }
 
 export interface FullMessage{
@@ -67,12 +67,12 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
                 return "I can't provide an answer for that";
             case "greetings": 
                 return "Hello to you as well, How can I help you?";
-            case "coin_info":
-                let tokenInfo: SearchTokensWebQuery | undefined;
+            case "coin_info": {
+                let tokenInfo: SearchTokensWebQuery | null = null;
                 for(const el of data.entities){
                     if(el.name == "crypto_coin"){
                         const res = await getTokensFromSearchQuery({
-                            chains: chains,
+                            chains,
                             searchQuery: el.value
                         });
                         if(res.searchTokens) {
@@ -86,10 +86,9 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
                 }else{
                     return "No coin could be found please try another coin!";
                 }
+            }
             case "connect_wallet": 
-                if(true){
-
-                }return "";
+                return "Connecting to wallet...";
             case "help": 
                 for(const el of data.entities){
                     switch(el.value){
@@ -120,14 +119,13 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
             default: 
                 return "I can't understand your question";
         }
-        
     } 
     return ttm().then(res=>{
         if(typeof res === 'object') return res as FullMessage;
         return {text: res as string, type: "text"};
     });
 }
-export const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: SearchTokensWebQuery, recommendedChain?: Chain): FullMessage => {
+const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: SearchTokensWebQuery, recommendedChain?: Chain): FullMessage => {
     console.log(type, tokensFrom, tokensTo, recommendedChain);
     if(type == "double" && tokensTo){
         const getFrom: Record<string, MyToken>  = {}
@@ -149,7 +147,7 @@ export const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, toke
                     if(key == to!.chain){
                         res[key] = {
                             from: val,
-                            to: to
+                            to
                         };
                     }
                 }

@@ -1,16 +1,14 @@
-import { memo, useCallback, useRef, useEffect, Fragment, KeyboardEvent, ChangeEvent, useImperativeHandle } from 'react'
-import { Button } from 'rebass';
+import { memo, useCallback, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { useNavigate, useParams } from 'react-router-dom';
 import { ButtonEmphasis, ButtonSize, ThemeButton } from 'components/Button';
-import { AiIcon, UniIcon } from 'components/Logo/UniIcon';
-import moment, { months } from 'moment';
+import { AiIcon } from 'components/Logo/UniIcon';
+import moment from 'moment';
 import { Edit, Trash } from 'ui/src/components/icons';
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
 import { InputContainer, Input } from 'components/Settings/Input';
-import { addHistoryItem, emptyChats, HistoryItem, removeChatItem, removeHistoryItem, resetTempHistory, updateHistoryItem } from 'state/chatbot/reducer';
+import { HistoryItem, removeHistoryItem, resetTempHistory, updateHistoryItem } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
-import { v4 as uuid } from 'uuid';
 import { scrollbarStyle } from 'components/SearchModal/CurrencyList/index.css';
 import Row from 'components/Row';
 
@@ -212,7 +210,7 @@ function Chatbot() {
         <SideButton
           emphasis={ButtonEmphasis.medium}
           size={ButtonSize.medium}
-          onClickCapture={(e) => {
+          onClickCapture={() => {
             if(item.renaming){
               handleSubmit();
             }else{

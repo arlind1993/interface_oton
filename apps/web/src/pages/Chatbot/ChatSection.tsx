@@ -1,15 +1,13 @@
-import { ButtonEmphasis, ButtonPrimary, ButtonSecondary, ButtonSize, SmallButtonPrimary, ThemeButton } from 'components/Button';
-import {ChangeEvent, KeyboardEvent, memo, useCallback, useEffect, useRef, useState} from 'react'
-import { Button } from 'rebass';
+import { ButtonEmphasis, ButtonPrimary, ButtonSecondary, ButtonSize, ThemeButton } from 'components/Button';
+import {KeyboardEvent, memo, useCallback, useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import Tooltip, { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
-import { TimePast, Person, Pencil, Edit, CopyFilled } from 'ui/src/components/icons';
-import { AiIcon, UniIcon } from 'components/Logo/UniIcon';
-import { InputContainer, Input } from 'components/Settings/Input';
+import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
+import { TimePast, Person, Pencil, CopyFilled } from 'ui/src/components/icons';
+import { AiIcon } from 'components/Logo/UniIcon';
+import { InputContainer } from 'components/Settings/Input';
 import { ResizingTextArea } from 'components/TextInput';
 import { scrollbarStyle } from '../../components/SearchModal/CurrencyList/index.css';
-import {Botkit} from "botkit";
-import { addChatItem, ChatItem, removeChatItem, removeHistoryItem, updateChatItem, updateHistoryItem } from 'state/chatbot/reducer';
+import { addChatItem, ChatItem, removeChatItem, updateChatItem } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import ChatInput from './ChatInput';
 import { useParams } from 'react-router-dom';
@@ -50,10 +48,6 @@ const ChatList = styled.div`
   flex: 1;
   overflow-y: auto;
   background: ${({theme} )=> theme.surface3};
-`;
-
-const ChatInputContainer = styled.div`
-  width: clamp(400px, 100%, 600px);
 `;
 
 const Title = styled.div`

@@ -26,7 +26,7 @@ import { getCLS, getFCP, getFID, getLCP, Metric } from 'web-vitals'
 import { findRouteByPath, RouteDefinition, routes, useRouterConfig } from './RouteDefinitions'
 import { useIsChatbotPage } from 'hooks/useIsChatbot'
 import ChatSection from './Chatbot/ChatSection'
-import { ButtonPrimary, ButtonSecondary } from 'components/Button'
+import { ButtonPrimary } from 'components/Button'
 import { AiIcon } from 'components/Logo/UniIcon'
 import { X } from 'ui/src/components/icons'
 

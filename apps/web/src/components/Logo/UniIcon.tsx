@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import HolidayUniIcon from './HolidayUniIcon'
-import { style } from 'd3'
 
 // ESLint reports `fill` is missing, whereas it exists on an SVGProps type
 export type SVGProps = React.SVGProps<SVGSVGElement> & {

@@ -1,8 +1,8 @@
-import { Chain, SearchTokensWebQuery, SearchTokensWebQueryVariables, TokenStandard } from "uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks";
+import { SearchTokensWebQuery, SearchTokensWebQueryVariables, } from "uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks";
 
 
 
-export interface EntityWit {
+interface EntityWit {
   body: string;
   confidence: number;
   end: number;
@@ -15,40 +15,40 @@ export interface EntityWit {
   value: string;
 }
 
-export interface EntitiesWit {
+interface EntitiesWit {
   [key: string]: EntityWit[];
 }
 
-export interface IntentWit {
+interface IntentWit {
   confidence: number;
   id: string;
   name: string;
 }
 
-export interface SuccessWit {
+interface SuccessWit {
   entities: EntitiesWit;
   intents: IntentWit[];
   text: string;
   traits: Record<string, any>; // Assuming traits could have various structures
 }
 
-export interface ResponseWit{
+interface ResponseWit{
   success?: MessageSuccess,
   error?: any,
 }
 
-export interface MessageIntent{
+interface MessageIntent{
   value: string
   confidence: number
 }
-export interface MessageEntity{
+ interface MessageEntity{
   value: string
   name: string
   role?: string
   confidence: number
 }
 
-export interface MessageIntent{
+interface MessageIntent{
   value: string
   confidence: number
 }
@@ -58,8 +58,8 @@ export interface MessageSuccess{
 }
 
 export const witBotSendMessage = async (message: string): Promise<ResponseWit> => {
-  if(true){
-    const res = new Promise((resolve: (value: ResponseWit)=> void , reject) => {
+  if(1 === 1){
+    const res = new Promise((resolve: (value: ResponseWit)=> void) => {
       setTimeout(()=>{
         resolve({
           success: {

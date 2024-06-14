@@ -1,4 +1,4 @@
-import { ButtonPrimary, ButtonSecondary, ThemeButton } from "components/Button";
+import { ButtonPrimary } from "components/Button";
 import Row from "components/Row";
 import { scrollbarStyle } from "components/SearchModal/CurrencyList/index.css";
 import { InputContainer } from "components/Settings/Input";
@@ -54,7 +54,7 @@ function ChatInput(){
     const isInChatbot = useIsChatbotPage();
     const {chainId} = useWeb3React();
     const chain = chainIdToBackendName(chainId);
-    const chats = useAppSelector((state) => state.chatbot.chats);
+    // const chats = useAppSelector((state) => state.chatbot.chats);
     const histories = useAppSelector((state) => state.chatbot.histories);
     const dispatch = useAppDispatch();
     const {chatId} = useParams<{chatId: string}>();

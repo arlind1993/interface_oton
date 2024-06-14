@@ -130,6 +130,7 @@ function useCreateTDPContext({chainNameImport, tokenAddressImport, isMini }: Tok
       isMini
     }
   }, [
+    isMini,
     currency,
     currencyChain,
     currencyChainId,

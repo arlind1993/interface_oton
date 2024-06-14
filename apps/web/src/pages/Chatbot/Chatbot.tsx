@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react'
+import { memo } from 'react'
 import styled from 'styled-components'
 import History from './History'
 import ChatSection from './ChatSection'
