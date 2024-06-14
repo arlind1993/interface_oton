@@ -76,8 +76,17 @@ function useMultiChainMap(tokenQuery: ReturnType<typeof useTokenWebQuery>) {
   }, [balanceQuery?.portfolios, tokenQuery.data?.token?.project?.tokens])
 }
 
-function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
-  const { tokenAddress, chainName } = useParams<{ tokenAddress: string; chainName?: string }>()
+export interface TokenDetailParams{
+  chainNameImport?: string
+  tokenAddressImport?: string
+  isMini?: boolean
+}
+
+function useCreateTDPContext({chainNameImport, tokenAddressImport, isMini }: TokenDetailParams): PendingTDPContext | LoadedTDPContext {
+  
+  const { tokenAddress: tokenAddressParam, chainName: chainNameParam } = useParams<{ tokenAddress: string; chainName?: string }>()
+  const { tokenAddress, chainName } = {tokenAddress: (tokenAddressImport ?? tokenAddressParam) , chainName : (chainNameImport ?? chainNameParam)};
+
   if (!tokenAddress) throw new Error('Invalid token details route: token address URL param is undefined')
   const currencyChain = validateUrlChainParam(chainName)
   const currencyChainId = supportedChainIdFromGQLChain(currencyChain)
@@ -97,7 +106,7 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
   const { currency, currencyWasFetchedOnChain } = useTDPCurrency(tokenQuery, tokenAddress, currencyChainId, isNative)
 
   const warning = useTokenWarning(tokenAddress, currencyChainId)
-
+  
   // Extract color for page usage
   const theme = useTheme()
   const { preloadedLogoSrc } = (useLocation().state as { preloadedLogoSrc?: string }) ?? {}
@@ -118,6 +127,7 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
       warning,
       multiChainMap,
       tokenColor,
+      isMini
     }
   }, [
     currency,
@@ -133,9 +143,9 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
   ])
 }
 
-export default function TokenDetailsPage() {
+export default function TokenDetailsPage(params?: TokenDetailParams) {
   const pageChainId = useWeb3React().chainId ?? ChainId.MAINNET
-  const contextValue = useCreateTDPContext()
+  const contextValue = useCreateTDPContext(params ?? {})
 
   return (
     <ThemeProvider accent1={contextValue.tokenColor ?? undefined}>
@@ -150,7 +160,6 @@ export default function TokenDetailsPage() {
             </TDPProvider>
           )
         }
-
         if (contextValue.tokenQuery.loading) {
           return <TokenDetailsPageSkeleton />
         } else {

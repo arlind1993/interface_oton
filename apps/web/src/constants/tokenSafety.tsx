@@ -46,10 +46,10 @@ export function getWarningCopy(warning: Warning | undefined, plural = false, tok
         heading = (
           <Plural
             value={plural ? 2 : 1}
-            one={t(`{{name}} isn't traded on leading U.S. centralized exchanges or frequently swapped on Uniswap.`, {
+            one={t(`{{name}} isn't traded on leading U.S. centralized exchanges or frequently swapped on Oton.`, {
               name: tokenSymbol ?? 'This token',
             })}
-            other="These tokens aren't traded on leading U.S. centralized exchanges or frequently swapped on Uniswap."
+            other="These tokens aren't traded on leading U.S. centralized exchanges or frequently swapped on Oton."
           />
         )
         description = <Trans>Always conduct your own research before trading.</Trans>

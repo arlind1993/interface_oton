@@ -1604,8 +1604,8 @@
       },
       "uniswapFee": {
         "message": {
-          "default": "Se aplican tarifas a algunos tokens seleccionados para garantizar la mejor experiencia con Uniswap. No hay ninguna tarifa asociada con este intercambio.",
-          "included": "Se aplican tarifas a algunos tokens seleccionados para garantizar la mejor experiencia con Uniswap y ya se han incluido en esta cotización."
+          "default": "Se aplican tarifas a algunos tokens seleccionados para garantizar la mejor experiencia con Otono hay ninguna tarifa asociada con este intercambio.",
+          "included": "Se aplican tarifas a algunos tokens seleccionados para garantizar la mejor experiencia con Otonya se han incluido en esta cotización."
         },
         "title": "Tarifa de intercambio"
       },

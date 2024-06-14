@@ -52,7 +52,7 @@ const AssetPage = () => {
     <>
       <Helmet>
         <title>
-          {asset.name ?? ''} {asset.name ? '|' : ''} {collection.collectionName ?? t`Explore NFTs`} on Uniswap
+          {asset.name ?? ''} {asset.name ? '|' : ''} {collection.collectionName ?? t`Explore NFTs`} on Oton
         </title>
       </Helmet>
       <Trace

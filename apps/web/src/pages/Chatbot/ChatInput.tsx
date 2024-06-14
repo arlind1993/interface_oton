@@ -15,6 +15,8 @@ import { v4 as uuid } from 'uuid';
 import { witBotSendMessage, } from './request';
 import { FullMessage, translateToMessage} from "./hooks";
 import { Chain } from "uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks";
+import { useWeb3React } from "@web3-react/core";
+import { chainIdToBackendName } from "graphql/data/util";
 
 
 
@@ -50,6 +52,8 @@ function ChatInput(){
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const [input, setInput] = useState<string>("");
     const isInChatbot = useIsChatbotPage();
+    const {chainId} = useWeb3React();
+    const chain = chainIdToBackendName(chainId);
     const chats = useAppSelector((state) => state.chatbot.chats);
     const histories = useAppSelector((state) => state.chatbot.histories);
     const dispatch = useAppDispatch();
@@ -124,7 +128,7 @@ function ChatInput(){
             }])
           );
         }else if(res.success){
-          fullMessage = await translateToMessage(res.success, Object.values(Chain));
+          fullMessage = await translateToMessage(res.success, Object.values(Chain), chain);
           fullMessage.status = "completed";
           console.log("fullMessageci", fullMessage)
           dispatch(

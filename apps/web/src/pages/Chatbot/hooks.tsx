@@ -56,10 +56,10 @@ export interface FullMessage{
     typeData?: any
     status?: string
 }
-export const translateToMessage = async(data: MessageSuccess, chains: Array<Chain>): Promise<FullMessage> => {
-    console.log("Wet Data", data);
+export const translateToMessage = async(data: MessageSuccess, chains: Array<Chain>, recommendedChainId?: Chain): Promise<FullMessage> => {
+    console.log("Wet Data", data, recommendedChainId);
     
-    const ttm  = async (data: MessageSuccess): Promise<string | FullMessage> => {
+    const ttm  = async (): Promise<string | FullMessage> => {
         switch(data.intent?.value){
             case "cant_answer": 
                 return "I can't provide an answer for that, as I am not an expert, talk to your finacial advisor for more information";
@@ -68,7 +68,7 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
             case "greetings": 
                 return "Hello to you as well, How can I help you?";
             case "coin_info":
-                let tokenInfo: SearchTokensWebQuery| undefined;
+                let tokenInfo: SearchTokensWebQuery | undefined;
                 for(const el of data.entities){
                     if(el.name == "crypto_coin"){
                         const res = await getTokensFromSearchQuery({
@@ -82,7 +82,7 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
                     }
                 }
                 if(tokenInfo){
-                    return resForCoins("single", tokenInfo, undefined, Chain.Ethereum);
+                    return resForCoins("single", tokenInfo, undefined, recommendedChainId);
                 }else{
                     return "No coin could be found please try another coin!";
                 }
@@ -122,7 +122,7 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
         }
         
     } 
-    return ttm(data).then(res=>{
+    return ttm().then(res=>{
         if(typeof res === 'object') return res as FullMessage;
         return {text: res as string, type: "text"};
     });
@@ -151,7 +151,6 @@ export const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, toke
                             from: val,
                             to: to
                         };
-                        break;
                     }
                 }
             }
@@ -166,7 +165,10 @@ export const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, toke
         if(recommendedChain && res[recommendedChain]){
             result.data = res[recommendedChain];
             result.chain = recommendedChain;
-        }else {
+        }else if (res[Chain.Ethereum]){
+            result.data = res[Chain.Ethereum];
+            result.chain = Chain.Ethereum;
+        }else  {
             const e = Object.entries(res);
             if(e.length > 0){
                 result.data = e[0][1];
@@ -192,17 +194,20 @@ export const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, toke
             if(from?.chain){
                 if(!res[from!.chain]){
                     res[from!.chain] = from;
-                    break;
                 }   
             }
         }
+        console.log("ssss", res);
         const result: {
            data?: MyToken
            chain?: string
         } = {};
         if(recommendedChain && res[recommendedChain]){
             result.data = res[recommendedChain];
-            result.chain
+            result.chain = recommendedChain;
+        }else if (res[Chain.Ethereum]){
+            result.data = res[Chain.Ethereum];
+            result.chain = Chain.Ethereum;
         }else {
             const e = Object.entries(res);
             if(e.length > 0){

@@ -64,16 +64,16 @@ const ConnectWalletButton = styled(ButtonPrimary)`
 
 function getProfilePageTitle(account: string | undefined, ENSName: string | null | undefined): string {
   if (!account) {
-    return t`NFT collection on Uniswap`
+    return t`NFT collection on Oton`
   }
 
   if (!ENSName) {
-    return t(`NFT collection on Uniswap - {{address}}`, {
+    return t(`NFT collection on Oton - {{address}}`, {
       address: shortenAddress(account),
     })
   }
 
-  return t(`{{name}}'s NFT collection on Uniswap`, {
+  return t(`{{name}}'s NFT collection on Oton`, {
     name: ENSName,
   })
 }

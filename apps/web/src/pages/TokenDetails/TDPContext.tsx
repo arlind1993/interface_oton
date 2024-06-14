@@ -34,10 +34,10 @@ type BaseTDPContext = {
   warning?: Warning
 }
 /** Token details context with an unresolved currency field */
-export type PendingTDPContext = BaseTDPContext & { currency: undefined }
+export type PendingTDPContext = BaseTDPContext & { currency: undefined, isMini?: boolean }
 
 /** Token details context with a successfully resolved currency field */
-export type LoadedTDPContext = BaseTDPContext & { currency: Currency }
+export type LoadedTDPContext = BaseTDPContext & { currency: Currency, isMini?: boolean }
 
 const TDPContext = createContext<LoadedTDPContext | undefined>(undefined)
 

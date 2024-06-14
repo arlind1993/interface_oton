@@ -17,6 +17,9 @@ import { witBotSendMessage } from './request';
 import { v4 as uuid } from 'uuid';
 import { FullMessage, translateToMessage } from './hooks';
 import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks';
+import { useWeb3React } from '@web3-react/core';
+import { chainIdToBackendName, getValidUrl } from 'graphql/data/util';
+import TokenDetailsPage from 'pages/TokenDetails';
 
 
 
@@ -112,6 +115,8 @@ const ButtonActionSecondary = styled(ButtonSecondary)`
 
 function ChatSection() {
   const dispatch = useAppDispatch();
+  const {chainId} = useWeb3React();
+  const chain = chainIdToBackendName(chainId);
   const chats = useAppSelector((state) => state.chatbot.chats);
   const {chatId} = useParams<{ chatId: string;}>();
   const refs = useRef<Record<string, HTMLTextAreaElement | null>>({});
@@ -222,7 +227,7 @@ function ChatSection() {
             }])
           );
         }else if(res.success){
-          fullMessage = await translateToMessage(res.success, Object.values(Chain));
+          fullMessage = await translateToMessage(res.success, Object.values(Chain), chain);
           fullMessage.status = "completed"
           console.log("fullMessagecs", fullMessage)
           dispatch(
@@ -256,70 +261,74 @@ function ChatSection() {
 
 
     return (
-      <Chatbox key={item.id} 
-        onMouseEnter={handleMouseEnter} 
-        onMouseLeave={handleMouseLeave}>
-        <div>
-          {item.isChatbotText
-          ? <AiIcon width={25} height={25}/>
-          : <CircleContainer>
-            <Person style ={{width:"auto", height:"auto"}}/>
-          </CircleContainer>}
-        </div>
-        <div style={{flex: 1}}>
-          <Title>{item.isChatbotText ? "Oton AI" : "You"}</Title>
-          <Description enabled={item.editing}>
-            <InputField
-              disabled = {!item.editing}
-              fontSize='16'
-              placeholder=''
-              className={`${scrollbarStyle}`}
-              onUserInput={handleOnChange}
-              refer={(e) => refs.current[id] = e}
-              onKeyDown={handleKeyPresses}
-              value={item.editing ? item.tempText : item.text}
-            />
-          </Description>
-          {item.editing 
-          ? <EditActionContainer>
-            <ButtonActionPrimary onClick={handleSubmit}>
-              Submit 
-            </ButtonActionPrimary>
-            <ButtonActionSecondary onClick={handleCancel}>
-              Cancel
-            </ButtonActionSecondary>
-          </EditActionContainer>
-          :<ActionContainer style={{opacity: item.hover ? 1: 0}}>
-            <MouseoverTooltip text="Copy" placement='bottom' size={TooltipSize.Auto}>
-              <ActionButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium} 
-                onClick={handleCopy}>
-                <CopyFilled style={iconActionStyle}/>
-              </ActionButton>
-            </MouseoverTooltip>
-            {false && item.isChatbotText && 
-              (
-              <MouseoverTooltip text="Regenerate" placement='bottom' size={TooltipSize.Auto}>
+      <>
+        <Chatbox key={item.id} 
+          onMouseEnter={handleMouseEnter} 
+          onMouseLeave={handleMouseLeave}>
+          <div>
+            {item.isChatbotText
+            ? <AiIcon width={25} height={25}/>
+            : <CircleContainer>
+              <Person style ={{width:"auto", height:"auto"}}/>
+            </CircleContainer>}
+          </div>
+          <div style={{flex: 1}}>
+            <Title>{item.isChatbotText ? "Oton AI" : "You"}</Title>
+            <Description enabled={item.editing}>
+              <InputField
+                disabled = {!item.editing}
+                fontSize='16'
+                placeholder=''
+                className={`${scrollbarStyle}`}
+                onUserInput={handleOnChange}
+                refer={(e) => refs.current[id] = e}
+                onKeyDown={handleKeyPresses}
+                value={item.editing ? item.tempText : item.text}
+              />
+            </Description>
+            {item.editing 
+            ? <EditActionContainer>
+              <ButtonActionPrimary onClick={handleSubmit}>
+                Submit 
+              </ButtonActionPrimary>
+              <ButtonActionSecondary onClick={handleCancel}>
+                Cancel
+              </ButtonActionSecondary>
+            </EditActionContainer>
+            :<ActionContainer style={{opacity: item.hover ? 1: 0}}>
+              <MouseoverTooltip text="Copy" placement='bottom' size={TooltipSize.Auto}>
                 <ActionButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium} 
-                  onClick={()=>{
-
-                  }}>
-                  <TimePast style={iconActionStyle}/>
+                  onClick={handleCopy}>
+                  <CopyFilled style={iconActionStyle}/>
                 </ActionButton>
-              </MouseoverTooltip>)
+              </MouseoverTooltip>
+              {false && item.isChatbotText && 
+                (
+                <MouseoverTooltip text="Regenerate" placement='bottom' size={TooltipSize.Auto}>
+                  <ActionButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium} 
+                    onClick={()=>{
+
+                    }}>
+                    <TimePast style={iconActionStyle}/>
+                  </ActionButton>
+                </MouseoverTooltip>)
+              }
+              {!item.isChatbotText &&
+              <MouseoverTooltip text="Edit" placement='bottom' size={TooltipSize.Auto}>
+                <ActionButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium} 
+                  onClick={handleEdit}>
+                  <Pencil style={iconActionStyle}/>
+                </ActionButton>
+              </MouseoverTooltip>
+              }
+            </ActionContainer>
             }
-            {!item.isChatbotText &&
-            <MouseoverTooltip text="Edit" placement='bottom' size={TooltipSize.Auto}>
-              <ActionButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium} 
-                onClick={handleEdit}>
-                <Pencil style={iconActionStyle}/>
-              </ActionButton>
-            </MouseoverTooltip>
-            }
-          </ActionContainer>
-          }
-        </div>
-        
-      </Chatbox>
+          </div>
+        </Chatbox>
+        {
+          item.typeData && (<TokenDetailsPage isMini={true} chainNameImport={getValidUrl(item.typeData?.chain)} tokenAddressImport={item.typeData?.data?.address}/>)
+        }
+      </>
     );
   }, [chats, chatId, histories]);
 

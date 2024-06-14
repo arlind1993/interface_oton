@@ -154,6 +154,21 @@ const URL_CHAIN_PARAM_TO_BACKEND: { [key: string]: InterfaceGqlChain } = {
   blast: Chain.Blast,
 }
 
+const BACKEND_CHAIN_TO_URL_PARAM: { [key: string]: string } = {
+  [Chain.Ethereum]: 'ethereum',
+  [Chain.Polygon]: 'polygon',
+  [Chain.Celo]: 'celo',
+  [Chain.Arbitrum]: 'arbitrum',
+  [Chain.Optimism]: 'optimism',
+  [Chain.Bnb]: 'bnb',
+  [Chain.Avalanche]: 'avalanche',
+  [Chain.Base]: 'base',
+  [Chain.Blast]: 'blast',
+};
+
+export function getValidUrl(chain: Chain | undefined): string | undefined {
+  return chain ? BACKEND_CHAIN_TO_URL_PARAM[chain] : undefined;
+}
 /**
  * @param chainName parsed in chain name from url query parameter
  * @returns if chainName is a valid chain name, returns the backend chain name, otherwise returns undefined

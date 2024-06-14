@@ -553,8 +553,8 @@
     "banner": {
       "extension": {
         "confirm": "Rejoindre la bêta",
-        "message": "Soyez le premier à essayer l'extension Uniswap sur votre navigateur Web",
-        "title": "L'extension Uniswap est ici"
+        "message": "Soyez le premier à essayer l'extension Otonr votre navigateur Web",
+        "title": "L'extension Otont ici"
       },
       "offline": "Vous êtes en mode hors ligne"
     },
@@ -579,9 +579,9 @@
     "modal": {
       "getExtension": {
         "step1": "1. Visitez <highlight>uniswap.org/ext</highlight> sur votre ordinateur",
-        "step2": "2. Ajoutez l'extension Uniswap sur votre navigateur Chrome",
+        "step2": "2. Ajoutez l'extension Otonr votre navigateur Chrome",
         "step3": "3. Entrez votre nom d'utilisateur pour y accéder",
-        "title": "Rejoignez la version bêta de l'extension Uniswap"
+        "title": "Rejoignez la version bêta de l'extension Oton
       }
     },
     "nfts": {
@@ -725,7 +725,7 @@
   },
   "notifications": {
     "scantastic": {
-      "subtitle": "Continuer sur l'extension Uniswap",
+      "subtitle": "Continuer sur l'extension Oton
       "title": "Succès!"
     }
   },
@@ -861,7 +861,7 @@
       },
       "checkEligibilityInstructions": "Entrez votre nom d'utilisateur <highlight>uni.eth</highlight> ci-dessous pour vérifier si vous êtes éligible pour la version bêta.",
       "eligible": {
-        "tagline": "Bienvenue dans la version bêta — vous êtes l'un des premiers à essayer l'extension Uniswap.",
+        "tagline": "Bienvenue dans la version bêta — vous êtes l'un des premiers à essayer l'extension Oton
         "title": "Vous n'êtes plus sur la liste d'attente !"
       },
       "ineligibleExplanation": "Vous êtes toujours sur la liste d'attente. Nous vous informerons dans l'application mobile Uniswap lorsque vous deviendrez éligible !",
@@ -913,7 +913,7 @@
       }
     },
     "scan": {
-      "button": "Scannez avec l'application Uniswap",
+      "button": "Scannez avec l'application Oton
       "error": "Désolé, nous ne pouvons pas charger le code QR pour le moment. Veuillez essayer une autre méthode d'intégration.",
       "otp": {
         "error": "Le code que vous avez soumis est incorrect ou une erreur s'est produite lors de la soumission. Veuillez réessayer.",
@@ -1030,7 +1030,7 @@
   "scantastic": {
     "code": {
       "expired": "Expiré",
-      "subtitle": "Entrez ce code dans l'extension Uniswap. Votre phrase de récupération sera cryptée et transférée en toute sécurité.",
+      "subtitle": "Entrez ce code dans l'extension Otonotre phrase de récupération sera cryptée et transférée en toute sécurité.",
       "timeRemaining": {
         "shorthand": {
           "hours": "Nouveau code en {{hours}}h {{minutes}}m {{seconds}}s",
@@ -1056,17 +1056,17 @@
       "encryption": "Échec de la préparation de la phrase de départ.",
       "noCode": "Aucun OTP reçu. Veuillez réessayer.",
       "timeout": {
-        "message": "Scannez à nouveau le code QR sur l'extension Uniswap pour continuer la synchronisation de votre portefeuille.",
+        "message": "Scannez à nouveau le code QR sur l'extension Otonur continuer la synchronisation de votre portefeuille.",
         "title": "Votre connexion a expiré"
       }
     },
     "modal": {
       "notOnWaitlist": {
-        "message": "Afin de devenir éligible à la version bêta de l'extension Uniswap, rejoignez la liste d'attente en réclamant un nom d'utilisateur uni.eth.",
+        "message": "Afin de devenir éligible à la version bêta de l'extension Otonejoignez la liste d'attente en réclamant un nom d'utilisateur uni.eth.",
         "title": "Vous n'êtes pas sur la liste d'attente"
       },
       "onWaitlist": {
-        "message": "Nous vous informerons dans l'application lorsque vous deviendrez éligible pour rejoindre la version bêta de l'extension Uniswap.",
+        "message": "Nous vous informerons dans l'application lorsque vous deviendrez éligible pour rejoindre la version bêta de l'extension Oton
         "title": "Vous êtes toujours sur la liste d'attente"
       }
     }

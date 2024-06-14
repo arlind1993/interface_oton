@@ -179,34 +179,42 @@ function TDPAnalytics({ children }: PropsWithChildren) {
 }
 
 export default function TokenDetails() {
-  const { address, currency, tokenQuery } = useTDPContext()
+  const { address, currency, tokenQuery, isMini } = useTDPContext()
   const tokenQueryData = tokenQuery.data?.token
 
   const { lg: isLargeScreenSize } = useScreenSize()
 
   return (
     <TDPAnalytics>
-      <TokenDetailsLayout>
+      <TokenDetailsLayout style={isMini ? {} : {padding: 10}}>
         <LeftPanel>
-          <TDPBreadcrumb />
+          {!isMini && (<TDPBreadcrumb />)}
           <TokenInfoContainer data-testid="token-info-container">
             <TokenDetailsHeader />
           </TokenInfoContainer>
           <ChartSection />
           <StatsSection chainId={currency.chainId} address={address} tokenQueryData={tokenQueryData} />
-          <DividerLine />
-          <ActivitySection />
-        </LeftPanel>
-        <RightPanel>
-          {isLargeScreenSize && (
+          {!isMini && (
             <>
-              <TDPSwapComponent />
-              <BalanceSummary />
+              <DividerLine />
+              <ActivitySection />
             </>
           )}
-          <TokenDescription />
-        </RightPanel>
-        <MobileBalanceSummaryFooter />
+        </LeftPanel>
+        {!isMini && (
+            <>
+              <RightPanel>
+                {isLargeScreenSize && (
+                  <>
+                    <TDPSwapComponent />
+                    <BalanceSummary />
+                  </>
+                )}
+                <TokenDescription />
+              </RightPanel>
+              <MobileBalanceSummaryFooter />
+            </>
+          )}
       </TokenDetailsLayout>
     </TDPAnalytics>
   )
