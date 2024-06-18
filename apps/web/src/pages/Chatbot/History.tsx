@@ -1,8 +1,7 @@
-import { memo, useCallback, useRef, useEffect, KeyboardEvent, ChangeEvent } from 'react'
+import { memo, useCallback, useRef, useEffect, KeyboardEvent, ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 import { useNavigate, useParams } from 'react-router-dom';
 import { ButtonEmphasis, ButtonSize, ThemeButton } from 'components/Button';
-import { AiIcon } from 'components/Logo/UniIcon';
 import moment from 'moment';
 import { Edit, Trash } from 'ui/src/components/icons';
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
@@ -11,6 +10,8 @@ import { HistoryItem, removeHistoryItem, resetTempHistory, updateHistoryItem } f
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import { scrollbarStyle } from 'components/SearchModal/CurrencyList/index.css';
 import Row from 'components/Row';
+import { useScreenSize } from 'hooks/useScreenSize';
+import { Z_INDEX } from 'theme/zIndex';
 
 
 const Section = styled.div`
@@ -18,11 +19,13 @@ const Section = styled.div`
   flex-direction: column;
   gap: 6px;
   padding: 5px;
-  background: ${({ theme }) => theme.surface1};
+  width: 150px;
+  background: green;
+  // background: ${({ theme }) => theme.surface1};
 `
 
 const HistoryButton = styled(ThemeButton)`
-  width: 150px;
+  width: 100%;
   height: 30px;
   justify-content: space-between;
   font-size : 12px;
@@ -103,7 +106,11 @@ export function timeAgo(inputTime: number) {// inputtime with ms
 }
 
 
-function Chatbot() {
+function History({}) {
+
+  const [isOpen ,setOpen] = useState<boolean>(true);
+  const screen = useScreenSize();
+
   const refs = useRef<Record<string, HTMLInputElement | null>>({});
   const navigation = useNavigate();
   const histories = useAppSelector((state) => state.chatbot.histories);
@@ -258,23 +265,38 @@ function Chatbot() {
 
 
   return (
-    <Section>
-      <HistoryButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => handlePress()}>
-        <AiIcon width={20} height={20} clickable={true} />
+    <Section style={ isOpen && screen.md? {} : {
+        position: "fixed",
+        zIndex: Z_INDEX.sticky,
+        top: 72,
+        bottom: 0,
+        left: 0
+      }}>
+      <Row>
+        <HistoryButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(!isOpen)}>
+          {isOpen ? "<<": ">>"}
+        </HistoryButton >
+        <HistoryButton style={{flex: 1}} size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => handlePress()}>
         <span>New Chat</span>
         <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", }}>
           <span style={{ width: 12 }}>+</span>
         </div>
       </HistoryButton>
-      <SideText>
-        My History
-      </SideText>
-      <HistoryContainer className={`${scrollbarStyle}`}>
-        {Object.entries(histories).filter(e => e[0] != "temp").map((e) => renderItem(e[1], e[0]))}
-      </HistoryContainer>
+      </Row>
+      
+      {
+        isOpen && (<div>
+          <SideText>
+            My History
+          </SideText>
+          <HistoryContainer className={`${scrollbarStyle}`}>
+            {Object.entries(histories).filter(e => e[0] != "temp").map((e) => renderItem(e[1], e[0]))}
+          </HistoryContainer>
+        </div>)
+      }
       
     </Section>
   )
 }
 
-export default memo(Chatbot)
+export default memo(History)

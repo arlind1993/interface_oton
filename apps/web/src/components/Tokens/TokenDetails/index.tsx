@@ -186,33 +186,35 @@ export default function TokenDetails() {
 
   return (
     <TDPAnalytics>
-      <TokenDetailsLayout style={isMini ? {} : {padding: 10}}>
-        <LeftPanel>
-          {!isMini && (<TDPBreadcrumb />)}
+      <TokenDetailsLayout style={isMini ?  {padding: 0}: {}}>
+        {isMini ? (<LeftPanel>
           <TokenInfoContainer data-testid="token-info-container">
             <TokenDetailsHeader />
           </TokenInfoContainer>
           <ChartSection />
           <StatsSection chainId={currency.chainId} address={address} tokenQueryData={tokenQueryData} />
-          {!isMini && (
+        </LeftPanel>): (
             <>
+            <LeftPanel>
+              <TDPBreadcrumb />
+              <TokenInfoContainer data-testid="token-info-container">
+                <TokenDetailsHeader />
+              </TokenInfoContainer>
+              <ChartSection />
+              <StatsSection chainId={currency.chainId} address={address} tokenQueryData={tokenQueryData} />
               <DividerLine />
               <ActivitySection />
-            </>
-          )}
-        </LeftPanel>
-        {!isMini && (
-            <>
-              <RightPanel>
-                {isLargeScreenSize && (
-                  <>
-                    <TDPSwapComponent />
-                    <BalanceSummary />
-                  </>
-                )}
-                <TokenDescription />
-              </RightPanel>
-              <MobileBalanceSummaryFooter />
+            </LeftPanel>
+            <RightPanel>
+              {isLargeScreenSize && (
+                <>
+                  <TDPSwapComponent />
+                  <BalanceSummary />
+                </>
+              )}
+              <TokenDescription />
+            </RightPanel>
+            <MobileBalanceSummaryFooter />
             </>
           )}
       </TokenDetailsLayout>

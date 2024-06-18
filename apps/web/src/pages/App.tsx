@@ -109,16 +109,17 @@ const ChatButton = styled(ButtonPrimary)<{opened: boolean}>`
 `
 
 const ChatbotBox = styled.div<{opened: boolean}>`
-  width: 300px;
+  width: 350px;
   height: 400px;
   position: fixed;
   z-index: ${Z_INDEX.sticky};
   background: ${({theme})=> theme.surface1};
+  right: 20px;
   bottom: 120px;
   border-radius: 12px;
   overflow: hidden;
-  right: 20px;
   display: flex;
+  background: green;
   border: 1px solid ${({theme}) => theme.surface4};
 
   transform-origin: bottom right;

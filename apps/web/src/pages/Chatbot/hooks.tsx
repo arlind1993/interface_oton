@@ -57,8 +57,6 @@ export interface FullMessage{
     status?: string
 }
 export const translateToMessage = async(data: MessageSuccess, chains: Array<Chain>, recommendedChainId?: Chain): Promise<FullMessage> => {
-    console.log("Wet Data", data, recommendedChainId);
-    
     const ttm  = async (): Promise<string | FullMessage> => {
         switch(data.intent?.value){
             case "cant_answer": 
@@ -89,26 +87,70 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
             }
             case "connect_wallet": 
                 return "Connecting to wallet...";
-            case "help": 
-                for(const el of data.entities){
-                    switch(el.value){
-                        case "deposit": return "";
-                        default: break; 
+            case "help": {
+                const helpTerms = data.entities.filter((e)=> e.name == "help_term");
+                const noHelpTerms = helpTerms.length === 0;
+                let textHeader ="";
+                if(noHelpTerms){
+                    textHeader = "I may not understand what you want help with, but here are a few options:";
+                }else if(helpTerms.length == 1){
+                    const data = helpTerms[0];
+                    switch(data.value){
+                        case "wallet": textHeader = "To connect to wallet you can click \"Connect\" on the top right or select the option down below!"; break;
+                        default: break;
                     }
+                }else{
+                    textHeader = "Click on one of the options...";
+                    helpTerms.push(...["wallet"].map(e=>({ 
+                            value: e,
+                            name: "help_term",
+                            confidence: 1,
+                        })
+                    ))
                 }
                 return {
-                    text: "I may not understand what you want help with, but here are a few options:",
+                    text: textHeader,
                     type: "options",
-                    options: [
-                        { 
-                            id: uuid(),
-                            href: 'openAccountDrawer',
-                            selected: false,
-                            text: "Connect with wallet"
+                    options: helpTerms.map(e=> {
+                        let text = "";
+                        switch(e.value){
+                            case "wallet": text = "Connect with wallet"; break;
+                            default: break;
                         }
-                    ]
+                        return {
+                            id: uuid(),
+                            action: e.value,
+                            selected: false,
+                            text: text
+                        }
+                    })
                 };
-            case "exchange_coins": return "";
+            }
+            case "exchange_coins":{
+                let tokenInfoFrom: SearchTokensWebQuery | undefined;
+                let tokenInfoTo: SearchTokensWebQuery | undefined;
+                for(const el of data.entities){
+                    if(el.name == "exchange_coin"){
+                        const res = await getTokensFromSearchQuery({
+                            chains,
+                            searchQuery: el.value
+                        });
+                        if(res.searchTokens) {                            
+                            if(tokenInfoFrom){
+                                tokenInfoTo = res;
+                                break;
+                            }else{
+                                tokenInfoFrom = res;
+                            }
+                        }
+                    }
+                }
+                if(tokenInfoFrom){
+                    return resForCoins("double", tokenInfoFrom, tokenInfoTo, recommendedChainId);
+                }else{
+                    return "A coin could not be found please try other coins!";
+                }
+            }
             case "extract": return "";
             case "keyword_info": return "";
             case "my_transactions": return "";
@@ -126,8 +168,8 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
     });
 }
 const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: SearchTokensWebQuery, recommendedChain?: Chain): FullMessage => {
-    console.log(type, tokensFrom, tokensTo, recommendedChain);
-    if(type == "double" && tokensTo){
+    if(type == "double"){
+        tokensTo ??= tokensFrom;
         const getFrom: Record<string, MyToken>  = {}
         const res : Record<string, {
             from: MyToken,
@@ -137,7 +179,6 @@ const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: 
             if(from?.chain){
                 if(!getFrom[from!.chain]){
                     getFrom[from!.chain] = from;
-                    break;
                 }   
             }
         }
@@ -177,7 +218,7 @@ const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: 
         if(result.data){
             return {
                 text: "Here are the details of the trade from "+ result.data.from.name +" to "+ result.data.to.name +"!",
-                type: "coin_details",
+                type: "trade_details",
                 typeData: result
             }
         }else{
@@ -195,7 +236,6 @@ const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: 
                 }   
             }
         }
-        console.log("ssss", res);
         const result: {
            data?: MyToken
            chain?: string

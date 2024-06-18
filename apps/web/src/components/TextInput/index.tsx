@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEventHandler, memo, useCallback, useRef } from 'react'
+import { ChangeEvent, KeyboardEventHandler, memo, useCallback, useEffect, useRef } from 'react'
 import styled, { CSSProperties } from 'styled-components'
 
 const Input = styled.input<{ error?: boolean; fontSize?: string }>`
@@ -124,6 +124,12 @@ export const ResizingTextArea = memo(
   }) => {
     const inputRef = useRef<HTMLTextAreaElement>(document.createElement('textarea'));
     const disable = disabled ?? false;
+    useEffect(()=>{
+      setTimeout(()=> {
+        inputRef.current.style.height = 'auto'
+        inputRef.current.style.height = inputRef.current.scrollHeight + 'px'
+      })
+    })
     const handleInput = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
         inputRef.current.style.height = 'auto'
         inputRef.current.style.height = inputRef.current.scrollHeight + 'px'

@@ -68,6 +68,30 @@ export default function SwapPage({ className }: { className?: string }) {
   )
 }
 
+
+export function MySwap({ className, chainId, initialInputAddressId, initialOutputAddressId }: { 
+  className?: string, chainId: ChainId, initialInputAddressId: string, initialOutputAddressId: string}
+) {
+
+  const initialInputCurrency = useCurrency(initialInputAddressId, chainId)
+  const initialOutputCurrency = useCurrency(initialOutputAddressId, chainId)
+
+  return (
+    <div style={{padding: 0}}>
+      <Swap
+      className={className}
+      chainId={chainId}
+      initialInputCurrency={initialInputCurrency}
+      initialOutputCurrency={initialOutputCurrency}
+      syncTabToUrl={true}
+    />
+    </div>
+    
+  )
+}
+
+
+
 /**
  * The swap component displays the swap interface, manages state for the swap, and triggers onchain swaps.
  *
@@ -94,6 +118,7 @@ export function Swap({
   compact?: boolean
   syncTabToUrl: boolean
 }) {
+
   const isDark = useIsDarkMode()
   const screenSize = useScreenSize()
 

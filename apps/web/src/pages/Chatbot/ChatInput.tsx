@@ -12,9 +12,6 @@ import { useAppDispatch, useAppSelector } from "state/hooks";
 import styled from 'styled-components'
 import { Share } from "ui/src/components/icons";
 import { v4 as uuid } from 'uuid';
-import { witBotSendMessage, } from './request';
-import { FullMessage, translateToMessage} from "./hooks";
-import { Chain } from "uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks";
 import { useWeb3React } from "@web3-react/core";
 import { chainIdToBackendName } from "graphql/data/util";
 
@@ -47,7 +44,9 @@ const SubmitButton = styled(ButtonPrimary)`
     margin: 5px;
 `;
 
-function ChatInput(){
+function ChatInput({requestSubmit}: {
+  requestSubmit: (message: string, historyId?: string) => void
+}){
     const navigator = useNavigate();
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const [input, setInput] = useState<string>("");
@@ -60,14 +59,11 @@ function ChatInput(){
     const {chatId} = useParams<{chatId: string}>();
 
     const onSubmit = async (message: string) => {
-
-      console.log('ON SUMBIT ::::::::::::::::::')
       message = message.trim()
       if(message == "") return; 
       setInput("");
       const userCid = uuid();
-      const botCid = uuid();
-      let historyId: string | null = null;
+      let historyId: string | undefined;
       if(isInChatbot && !chatId){
         historyId = uuid();
         dispatch(
@@ -95,50 +91,7 @@ function ChatInput(){
           status: "completed",                 
         }], historyId: historyId ?? chatId ?? "temp"})
       );
-
-      console.log("uopt");
-      dispatch(
-        addChatItem({items:[{
-          id: botCid,
-          hover: false,
-          editing: false,
-          isChatbotText: true,
-          text: "Providing an answer...",
-          tempText: "",
-          type: "text",
-          status: "sending",                 
-        }],historyId: historyId ?? chatId ?? "temp"})
-      );
-
-      console.log(message);
-
-      console.log("add");
-      witBotSendMessage(message).then(async(res)=>{
-        let fullMessage: FullMessage = {
-          text: "",
-          type: "text"
-        };
-        if(res.error){
-          fullMessage.text = "No response, Connection failed";
-          fullMessage.status = "failed";
-          dispatch(
-            updateChatItem([{
-              id: botCid,
-              item: fullMessage
-            }])
-          );
-        }else if(res.success){
-          fullMessage = await translateToMessage(res.success, Object.values(Chain), chain);
-          fullMessage.status = "completed";
-          console.log("fullMessageci", fullMessage)
-          dispatch(
-            updateChatItem([{
-              id: botCid,
-              item: fullMessage
-            }])
-          );
-        }
-      })
+      requestSubmit(message, historyId);
     };
 
 

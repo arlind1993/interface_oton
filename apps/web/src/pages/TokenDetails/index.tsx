@@ -147,6 +147,7 @@ function useCreateTDPContext({chainNameImport, tokenAddressImport, isMini }: Tok
 export default function TokenDetailsPage(params?: TokenDetailParams) {
   const pageChainId = useWeb3React().chainId ?? ChainId.MAINNET
   const contextValue = useCreateTDPContext(params ?? {})
+  console.log("TDP", contextValue);
 
   return (
     <ThemeProvider accent1={contextValue.tokenColor ?? undefined}>

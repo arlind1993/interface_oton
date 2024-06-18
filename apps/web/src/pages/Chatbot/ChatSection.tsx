@@ -1,5 +1,5 @@
 import { ButtonEmphasis, ButtonPrimary, ButtonSecondary, ButtonSize, ThemeButton } from 'components/Button';
-import {KeyboardEvent, memo, useCallback, useEffect, useRef } from 'react'
+import {KeyboardEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
 import { TimePast, Person, Pencil, CopyFilled } from 'ui/src/components/icons';
@@ -7,7 +7,7 @@ import { AiIcon } from 'components/Logo/UniIcon';
 import { InputContainer } from 'components/Settings/Input';
 import { ResizingTextArea } from 'components/TextInput';
 import { scrollbarStyle } from '../../components/SearchModal/CurrencyList/index.css';
-import { addChatItem, ChatItem, removeChatItem, updateChatItem } from 'state/chatbot/reducer';
+import { addChatItem, ChatItem, removeChatItem, updateChatItem, updateChatItemOptionsClicked } from 'state/chatbot/reducer';
 import { useAppDispatch, useAppSelector } from 'state/hooks';
 import ChatInput from './ChatInput';
 import { useParams } from 'react-router-dom';
@@ -18,6 +18,9 @@ import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/t
 import { useWeb3React } from '@web3-react/core';
 import { chainIdToBackendName, getValidUrl } from 'graphql/data/util';
 import TokenDetailsPage from 'pages/TokenDetails';
+import { MySwap, Swap } from 'pages/Swap';
+import Row from 'components/Row';
+import { useAccountDrawer } from 'components/AccountDrawer/MiniPortfolio/hooks';
 
 
 
@@ -105,9 +108,15 @@ const ButtonActionSecondary = styled(ButtonSecondary)`
 `;
 
 
+
+const Option = styled(ButtonSecondary)`
+`;
+
+
 // const controller = new Botkit();
 
 function ChatSection() {
+  const [, toggleAccountDrawer] = useAccountDrawer()
   const dispatch = useAppDispatch();
   const {chainId} = useWeb3React();
   const chain = chainIdToBackendName(chainId);
@@ -123,7 +132,52 @@ function ChatSection() {
     }
   }, [chatId, histories[chatId ?? ""]?.chats.length])
 
-
+  const requestSubmit = useCallback((message: string, historyId?: string)=>{
+    const botCid = uuid();
+    dispatch(
+      addChatItem({items:[{
+        id: botCid,
+        hover: false,
+        editing: false,
+        isChatbotText: true,
+        text: "Providing an answer...",
+        tempText: "",
+        type: "text",
+        status: "sending",                 
+      }],historyId: historyId ?? chatId ?? "temp"})
+    );
+    witBotSendMessage(message).then(async(res)=>{
+      let fullMessage: FullMessage = {
+        text: "",
+        type: "text"
+      };
+      if(res.error){
+        fullMessage.text = "No response, Connection failed";
+        fullMessage.status = "failed";
+        dispatch(
+          updateChatItem([{
+            id: botCid,
+            item: fullMessage
+          }])
+        );
+      }else if(res.success){
+        fullMessage = await translateToMessage(res.success, Object.values(Chain), chain);
+        fullMessage.status = "completed";
+        console.log("fullMessageci", fullMessage)
+        dispatch(
+          updateChatItem([{
+            id: botCid,
+            item: fullMessage
+          }])
+        );
+      }
+      setTimeout(()=>{
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      })
+    })
+  }, [chats, chatId, histories]);
 
   const renderItem = useCallback((item: ChatItem, id: string) => {
     const handleMouseEnter = () => {
@@ -176,64 +230,18 @@ function ChatSection() {
       }
 
       for(const cid of hcids){
-          
-        console.log("removeChats", removeChats, id, cid, after);
         if(after){
           removeChats.push(cid);
         }
         if(id === cid){
           after = true;
         }
-        console.log("removeChats", removeChats);
       }
 
       dispatch(
         removeChatItem({ids: removeChats, historyId: chatId ?? "temp"})
       );
-      
-      const botCid = uuid();
-      console.log("add");
-      dispatch(
-        addChatItem({items:[{
-          id: botCid,
-          hover: false,
-          editing: false,
-          isChatbotText: true,
-          text: "Providing an answer...",
-          tempText: "",
-          type: "text",
-          status: "sending",                 
-        }],historyId: chatId ?? "temp"})
-      )
-
-      witBotSendMessage(trimmedMsg).then(async(res)=>{
-        let fullMessage: FullMessage = {
-          text: "",
-          type: "text",
-        };
-        if(res.error){
-          fullMessage.text = "No response, Connection failed";
-          fullMessage.status = "failed";
-          dispatch(
-            updateChatItem([{
-              id: botCid,
-              item: fullMessage
-            }])
-          );
-        }else if(res.success){
-          fullMessage = await translateToMessage(res.success, Object.values(Chain), chain);
-          fullMessage.status = "completed"
-          console.log("fullMessagecs", fullMessage)
-          dispatch(
-            updateChatItem([{
-              id: botCid,
-              item: fullMessage
-            }])
-          );
-        }
-      })
-
-
+      requestSubmit(trimmedMsg);
     };
     const handleCancel = () => {
       dispatch(
@@ -317,11 +325,40 @@ function ChatSection() {
               }
             </ActionContainer>
             }
+            
+            { item.type == "coin_details" && item.typeData && 
+              (<TokenDetailsPage isMini={true} chainNameImport={getValidUrl(item.typeData?.chain)} tokenAddressImport={item.typeData?.data?.address}/>) 
+            }  
+            { item.type == "trade_details" && item.typeData &&
+              (<MySwap chainId={item.typeData?.chain} initialInputAddressId={item.typeData?.data?.from.address} initialOutputAddressId={item.typeData?.data?.to.address}/>)
+            }
+            { item.type == "options" && item.options &&
+              (<Row gap="10px" > 
+                {
+                  item.options.map((option,index) => {
+                    let action: (()=>void) | undefined ;
+                    switch(option.action){
+                      case "wallet": action = () => {
+                        toggleAccountDrawer();
+                      }
+                    }
+                    const onClick = ()=>{
+                      if(action){
+                        action();
+                      }
+                      dispatch(updateChatItemOptionsClicked({itemId: id, optionPos: index, selected: true}));
+                    }
+                    return ( 
+                      <ButtonActionSecondary style={option.selected ? {}: {}}onClick={onClick}>
+                        {option.text}
+                      </ButtonActionSecondary>
+                    );
+                  })
+                }
+              </Row>)
+            }
           </div>
         </Chatbox>
-        {
-          item.typeData && (<TokenDetailsPage isMini={true} chainNameImport={getValidUrl(item.typeData?.chain)} tokenAddressImport={item.typeData?.data?.address}/>)
-        }
       </>
     );
   }, [chats, chatId, histories]);
@@ -349,7 +386,7 @@ function ChatSection() {
       <ChatList className={`${scrollbarStyle}`} ref={(e)=>scrollRef.current = e}>
         {...chatItems()}
       </ChatList>
-      <ChatInput/>
+      <ChatInput requestSubmit={requestSubmit}/>
     </Section>
   );
 }

@@ -58,32 +58,56 @@ export interface MessageSuccess{
 }
 
 export const witBotSendMessage = async (message: string): Promise<ResponseWit> => {
+  console.log("send",message);
   if(1 === 1){
-    const res = new Promise((resolve: (value: ResponseWit)=> void) => {
+    return new Promise((resolve: (value: ResponseWit)=> void) => {
       setTimeout(()=>{
         resolve({
           success: {
             entities: [
               {
-                name: "crypto_coin",
+                name: "exchange_coin",
                 confidence: 0.9,
                 value: "Bitcoin",
               },{
-                name: "crypto_coin",
+                name: "exchange_coin",
                 confidence: 0.9,
                 value: "Etherium",
               },
             ],
             intent: {
               confidence: 0.9,
-              value: "coin_info"
+              value: "exchange_coins"
             }
           }
         })
       },500);
-    })
-    return res;
-  }
+      });
+    } else if(1==1){
+      return new Promise((resolve: (value: ResponseWit)=> void) => {
+        setTimeout(()=>{
+          resolve({
+            success: {
+              entities: [
+                {
+                  name: "help_term",
+                  confidence: 0.9,
+                  value: "wallet",
+                },{
+                  name: "exchange_coin",
+                  confidence: 0.9,
+                  value: "Etherium",
+                },
+              ],
+              intent: {
+                confidence: 0.9,
+                value: "help"
+              }
+            }
+          })
+        },500);
+      });
+    }
   try{
     const vId = 20240603;
     const url = `https://api.wit.ai/message?v=${vId}&q=${message}`
@@ -174,7 +198,6 @@ export const getTokensFromSearchQuery = async(variables: SearchTokensWebQueryVar
       }
     }
   `;
-    console.log("getTokensFromSearchQuery", variables)
 
     return fetch('https://beta.gateway.uniswap.org/v1/graphql', {
         method: 'POST',
@@ -189,7 +212,7 @@ export const getTokensFromSearchQuery = async(variables: SearchTokensWebQueryVar
         }
         return response.json();
     }).then(data => {
-        console.log(data);
+        console.log("Wit res", data);
         return data.data;
     }).catch(error => {
         // Handle errors here

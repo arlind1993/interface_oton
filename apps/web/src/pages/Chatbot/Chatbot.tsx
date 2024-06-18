@@ -1,8 +1,10 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import styled from 'styled-components'
 import History from './History'
 import ChatSection from './ChatSection'
 import Row from 'components/Row'
+import { useScreenSize } from 'hooks/useScreenSize'
+import { screen } from 'test-utils/render';
 
 
 const Container = styled.main`
@@ -15,18 +17,18 @@ const Container = styled.main`
 const ChatSectionContainer = styled.div`
   display: flex;
   height: calc(100vh  - 72px - 80px );
-  width: clamp(400px, 100%, 600px);
+  width: 100%;
+  max-width: 600px;
   padding: 10px;
 `
-
 function Chatbot() {
   return (
     <Container data-testid="chatbot-page">
-      <History></History>
+      <History/>
       <Row justify='center'>
         <ChatSectionContainer>
-        <ChatSection></ChatSection>
-      </ChatSectionContainer>
+          <ChatSection/>
+        </ChatSectionContainer>
       </Row>
       
     </Container>

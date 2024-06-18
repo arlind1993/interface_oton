@@ -25,8 +25,8 @@ export interface ChatItem {
 export interface OptionsItem {
   id: string
   text: string
-  href?: string
-  selected: false
+  action: string
+  selected: boolean
 }
 
 export interface ChatbotState {
@@ -99,8 +99,8 @@ const initialState: ChatbotState = {
       tempText: "",
       type: "options",
       options: [
-        {id: "1", text: "Go to main", href: "/", selected: false},
-        {id: "2", text: "Go to explore", href: "/explore", selected: false},
+        {id: "1", text: "Go to main", action: "/", selected: false},
+        {id: "2", text: "Go to explore", action: "/explore", selected: false},
       ],
       isChatbotText: true,
       hover: false,
@@ -147,6 +147,18 @@ const walletsSlice = createSlice({
       for(const {id, item} of payload){
         if(state.chats[id]){
           Object.assign(state.chats[id], item);
+        }
+      }
+    },
+    updateChatItemOptionsClicked( state, {payload: {itemId, optionPos, selected}}: PayloadAction<{
+      itemId: string,
+      optionPos: number,
+      selected: boolean
+    }>) {
+      console.log("updateChatItemOptionsClicked", itemId, optionPos, selected);
+      if(itemId in state.chats){
+        if(state.chats[itemId].options && state.chats[itemId].options![optionPos]){
+          state.chats[itemId].options![optionPos].selected = selected;
         }
       }
     },
@@ -221,6 +233,7 @@ export const {
   removeChatItem, 
   // emptyChats,
   // emptyHistories,
+  updateChatItemOptionsClicked,
   resetTempHistory,
 } = walletsSlice.actions
 export default walletsSlice.reducer
