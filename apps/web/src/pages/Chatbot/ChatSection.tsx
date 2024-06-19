@@ -109,7 +109,10 @@ const ButtonActionSecondary = styled(ButtonSecondary)`
 
 
 
-const Option = styled(ButtonSecondary)`
+const SectionHeader = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 5px;
 `;
 
 
@@ -283,7 +286,7 @@ function ChatSection() {
                 placeholder=''
                 className={`${scrollbarStyle}`}
                 onUserInput={handleOnChange}
-                refer={(e) => refs.current[id] = e}
+                refer={{key: id, refObject: refs}}
                 onKeyDown={handleKeyPresses}
                 value={item.editing ? item.tempText : item.text}
               />
@@ -384,6 +387,7 @@ function ChatSection() {
   return (
     <Section>
       <ChatList className={`${scrollbarStyle}`} ref={(e)=>scrollRef.current = e}>
+        <SectionHeader>Oton AI Your personal chatbot</SectionHeader>
         {...chatItems()}
       </ChatList>
       <ChatInput requestSubmit={requestSubmit}/>

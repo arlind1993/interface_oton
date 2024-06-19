@@ -18,7 +18,7 @@ const ChatSectionContainer = styled.div`
   display: flex;
   height: calc(100vh  - 72px - 80px );
   width: 100%;
-  max-width: 600px;
+  max-width: 200px;
   padding: 10px;
 `
 function Chatbot() {

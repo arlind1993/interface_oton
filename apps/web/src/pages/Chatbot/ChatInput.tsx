@@ -37,11 +37,11 @@ const InputField = styled(ResizingTextArea)`
 `;
 
 const SubmitButton = styled(ButtonPrimary)`
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    padding: 0;
-    margin: 5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0;
+  margin: 5px;
 `;
 
 function ChatInput({requestSubmit}: {
@@ -99,7 +99,7 @@ function ChatInput({requestSubmit}: {
         <Row style={{alignItems: 'flex-end'}}>
             <Description enabled={true}>
                 <InputField 
-                    refer={(e)=>inputRef.current = e}
+                    refer={inputRef}
                     fontSize='16'
                     placeholder='Message OTON AI'
                     className={`${scrollbarStyle}`}

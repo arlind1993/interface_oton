@@ -59,7 +59,7 @@ export interface MessageSuccess{
 
 export const witBotSendMessage = async (message: string): Promise<ResponseWit> => {
   console.log("send",message);
-  if(1 === 1){
+  if(1 !== 1){
     return new Promise((resolve: (value: ResponseWit)=> void) => {
       setTimeout(()=>{
         resolve({
@@ -83,7 +83,7 @@ export const witBotSendMessage = async (message: string): Promise<ResponseWit> =
         })
       },500);
       });
-    } else if(1==1){
+    } else if(1!=1){
       return new Promise((resolve: (value: ResponseWit)=> void) => {
         setTimeout(()=>{
           resolve({
@@ -102,6 +102,30 @@ export const witBotSendMessage = async (message: string): Promise<ResponseWit> =
               intent: {
                 confidence: 0.9,
                 value: "help"
+              }
+            }
+          })
+        },500);
+      });
+    }else if(2==2){
+      return new Promise((resolve: (value: ResponseWit)=> void) => {
+        setTimeout(()=>{
+          resolve({
+            success: {
+              entities: [
+                {
+                  name: "crypto_coin",
+                  confidence: 0.9,
+                  value: "Bit",
+                },{
+                  name: "exchange_coin",
+                  confidence: 0.9,
+                  value: "Etherium",
+                },
+              ],
+              intent: {
+                confidence: 0.9,
+                value: "coin_info"
               }
             }
           })

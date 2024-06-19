@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useNavigate, useParams } from 'react-router-dom';
 import { ButtonEmphasis, ButtonSize, ThemeButton } from 'components/Button';
 import moment from 'moment';
-import { Edit, Trash } from 'ui/src/components/icons';
+import { AddButton, Edit, LeftArrow, RightArrow, Trash } from 'ui/src/components/icons';
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip';
 import { InputContainer, Input } from 'components/Settings/Input';
 import { HistoryItem, removeHistoryItem, resetTempHistory, updateHistoryItem } from 'state/chatbot/reducer';
@@ -19,9 +19,7 @@ const Section = styled.div`
   flex-direction: column;
   gap: 6px;
   padding: 5px;
-  width: 150px;
-  background: green;
-  // background: ${({ theme }) => theme.surface1};
+  background: ${({ theme }) => theme.surface1};
 `
 
 const HistoryButton = styled(ThemeButton)`
@@ -34,6 +32,29 @@ const HistoryButton = styled(ThemeButton)`
   border-radius: 10px;
   position: relative;
 
+`;
+
+
+const TopButton = styled(ThemeButton)`
+  width: 30px;
+  height: 30px;
+  justify-content: space-between;
+  font-size : 12px;
+  line-height: 12px;
+  padding: 5px;
+  border-radius: 5px;
+  position: relative;
+
+`;
+
+const CloseBackground = styled(ThemeButton)`
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0.5;
+  z-index: ${Z_INDEX.sticky-10}
 `;
 
 const SideButton = styled(ThemeButton)`
@@ -107,7 +128,7 @@ export function timeAgo(inputTime: number) {// inputtime with ms
 
 
 function History({}) {
-
+  const historyTabSize = 175;
   const [isOpen ,setOpen] = useState<boolean>(true);
   const screen = useScreenSize();
 
@@ -215,6 +236,7 @@ function History({}) {
         size={ButtonSize.medium}
         >
         <SideButton
+          style={{flex: 1}}
           emphasis={ButtonEmphasis.medium}
           size={ButtonSize.medium}
           onClickCapture={() => {
@@ -239,8 +261,8 @@ function History({}) {
           />
           </TitleContainer>
         </SideButton>
-        {(item.id == chatId || item.hover) &&
-          <Row>
+        {(item.id == chatId || item.hover ) &&
+          <Row width='unset'>
             <MouseoverTooltip text="Rename" placement='bottom' size={TooltipSize.Auto}>
               <SideButton emphasis={ButtonEmphasis.medium} size={ButtonSize.medium}
                 onClickCapture={(e)=>{
@@ -265,37 +287,47 @@ function History({}) {
 
 
   return (
-    <Section style={ isOpen && screen.md? {} : {
+    <>
+      {isOpen && !screen.md && <CloseBackground size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(false)}/>}
+      <Section style={ isOpen && screen.md ? {minWidth: historyTabSize, maxWidth: historyTabSize} : {
         position: "fixed",
-        zIndex: Z_INDEX.sticky,
+        zIndex: Z_INDEX.sticky - 10 ,
         top: 72,
-        bottom: 0,
-        left: 0
+        bottom: isOpen ? 0: "unset",
+        left: 0,
+        minWidth: isOpen ? historyTabSize :"unset",
+        maxWidth: isOpen ? historyTabSize :"unset"  
       }}>
-      <Row>
-        <HistoryButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(!isOpen)}>
-          {isOpen ? "<<": ">>"}
-        </HistoryButton >
-        <HistoryButton style={{flex: 1}} size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => handlePress()}>
-        <span>New Chat</span>
-        <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", }}>
-          <span style={{ width: 12 }}>+</span>
-        </div>
-      </HistoryButton>
+      <Row justify="space-between" gap='5px'>
+          {isOpen ? (
+            <MouseoverTooltip text="Close History" placement='bottom' size={TooltipSize.Auto}>
+              <TopButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(!isOpen)}>
+                <LeftArrow style={{width: 20, height: 20}}/>
+              </TopButton>
+            </MouseoverTooltip>
+          ):(
+            <MouseoverTooltip text="Open History" placement='bottom' size={TooltipSize.Auto}>
+              <TopButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(!isOpen)}>  
+                <RightArrow style={{width: 20, height: 20}}/>
+              </TopButton>
+            </MouseoverTooltip>
+          )}
+        <MouseoverTooltip text="New Chat" placement='bottom' size={TooltipSize.Auto}>
+          <TopButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => handlePress()}>
+            <AddButton style={{width: 20, height: 20}} />
+          </TopButton>
+        </MouseoverTooltip>
       </Row>
-      
-      {
-        isOpen && (<div>
+      { isOpen && (<div>
           <SideText>
             My History
           </SideText>
           <HistoryContainer className={`${scrollbarStyle}`}>
             {Object.entries(histories).filter(e => e[0] != "temp").map((e) => renderItem(e[1], e[0]))}
           </HistoryContainer>
-        </div>)
-      }
-      
-    </Section>
+        </div>)}
+      </Section>
+    </>
   )
 }
 

@@ -1,4 +1,5 @@
-import { ChangeEvent, KeyboardEventHandler, memo, useCallback, useEffect, useRef } from 'react'
+import { id } from '@uniswap/uniswapx-sdk';
+import { ChangeEvent, KeyboardEventHandler, memo, MutableRefObject, useCallback, useEffect, useRef } from 'react'
 import styled, { CSSProperties } from 'styled-components'
 
 const Input = styled.input<{ error?: boolean; fontSize?: string }>`
@@ -100,6 +101,14 @@ export const TextInput = ({
   )
 }
 
+const simpleRefer = (obj: any): obj is MutableRefObject<HTMLTextAreaElement | null> => {
+  return (obj as  MutableRefObject< HTMLTextAreaElement | null>).current !== undefined;
+}
+
+const objectRefer = (obj: any): obj is { key: string; refObject: (MutableRefObject<Record<string, HTMLTextAreaElement | null>>) } => {
+  return (obj as { key: string; refObject: MutableRefObject<Record<string, HTMLTextAreaElement | null>>; }).key !== undefined;
+}
+
 export const ResizingTextArea = memo(
   ({
     className,
@@ -118,21 +127,31 @@ export const ResizingTextArea = memo(
     placeholder: string
     fontSize: string
     disabled?: boolean 
-    refer?: (e: HTMLTextAreaElement | null) => HTMLTextAreaElement | null
+    refer?: MutableRefObject<HTMLTextAreaElement | null> | {
+      key: string,
+      refObject: (MutableRefObject<Record<string, HTMLTextAreaElement | null>>),
+    }
     onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement> 
     style?: CSSProperties
   }) => {
-    const inputRef = useRef<HTMLTextAreaElement>(document.createElement('textarea'));
+    const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const disable = disabled ?? false;
-    useEffect(()=>{
-      setTimeout(()=> {
-        inputRef.current.style.height = 'auto'
-        inputRef.current.style.height = inputRef.current.scrollHeight + 'px'
-      })
-    })
     const handleInput = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-        inputRef.current.style.height = 'auto'
-        inputRef.current.style.height = inputRef.current.scrollHeight + 'px'
+      console.log("get info ", simpleRefer(refer) && refer?.current);
+        if(refer){
+          if(simpleRefer(refer) && refer.current){
+            refer.current.style.height = 'auto'
+            refer.current.style.height = refer.current.scrollHeight + 'px'
+          }else if(objectRefer(refer) && refer.refObject.current[refer.key]){
+            refer.refObject.current[refer.key]!.style.height = "auto"
+            refer.refObject.current[refer.key]!.style.height = refer.refObject.current[refer.key]!.scrollHeight + 'px'
+          }
+        }else{
+          if(inputRef.current){
+            inputRef.current.style.height = 'auto'
+            inputRef.current.style.height = inputRef.current.scrollHeight + 'px'
+          }
+        }
         onUserInput(event.target.value)
       },[value]
     )
@@ -153,7 +172,19 @@ export const ResizingTextArea = memo(
         onKeyDown={onKeyDown}
         value={value}
         fontSize={fontSize}
-        ref={refer ?? inputRef}
+        ref={e=> {
+          if(refer){
+            if(simpleRefer(refer) && refer.current){
+              refer.current = e;
+            }else if(objectRefer(refer) && refer.refObject.current[refer.key]){
+              refer.refObject.current[refer.key] = e;
+            }
+          }else{
+            if(inputRef.current){
+              inputRef.current = e;
+            }
+          }
+        }}
       />
     )
   }

@@ -119,9 +119,7 @@ const ChatbotBox = styled.div<{opened: boolean}>`
   border-radius: 12px;
   overflow: hidden;
   display: flex;
-  background: green;
   border: 1px solid ${({theme}) => theme.surface4};
-
   transform-origin: bottom right;
   transition: transform 5s ease-in-out;
   transform: scale(${({opened})=> opened ? 1: 0});

@@ -67,6 +67,7 @@ export const RightPanel = styled.div`
 export const TokenInfoContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   padding-top: 8px;
   margin-bottom: 20px;
