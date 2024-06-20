@@ -10,7 +10,6 @@ import { screen } from 'test-utils/render';
 const Container = styled.main`
   display: flex;
   flex-direction: row;
-  flex: 1;
   width: 100%;
 `
 
@@ -18,19 +17,18 @@ const ChatSectionContainer = styled.div`
   display: flex;
   height: calc(100vh  - 72px - 80px );
   width: 100%;
-  max-width: 200px;
+  max-width: 600px;
   padding: 10px;
 `
 function Chatbot() {
   return (
     <Container data-testid="chatbot-page">
       <History/>
-      <Row justify='center'>
+      <Row flex={1} justify='center'>
         <ChatSectionContainer>
           <ChatSection/>
         </ChatSectionContainer>
       </Row>
-      
     </Container>
   )
 }

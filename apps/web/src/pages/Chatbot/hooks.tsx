@@ -56,7 +56,8 @@ export interface FullMessage{
     typeData?: any
     status?: string
 }
-export const translateToMessage = async(data: MessageSuccess, chains: Array<Chain>, recommendedChainId?: Chain): Promise<FullMessage> => {
+export const translateToMessage = async(data: MessageSuccess, chains: Array<Chain>, recommendedChainId?: Chain, account?: string): Promise<FullMessage> => {
+    
     const ttm  = async (): Promise<string | FullMessage> => {
         switch(data.intent?.value){
             case "cant_answer": 
@@ -68,10 +69,10 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
             case "coin_info": {
                 let tokenInfo: SearchTokensWebQuery | null = null;
                 for(const el of data.entities){
-                    if(el.name == "crypto_coin"){
+                    if(el.name == "cryptocoin"){
                         const res = await getTokensFromSearchQuery({
                             chains,
-                            searchQuery: el.value
+                            searchQuery: el.value,
                         });
                         if(res.searchTokens) {
                             tokenInfo = res;
@@ -85,36 +86,41 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
                     return "No coin could be found please try another coin!";
                 }
             }
-            case "connect_wallet": 
-                return "Connecting to wallet...";
             case "help": {
                 const helpTerms = data.entities.filter((e)=> e.name == "help_term");
-                const noHelpTerms = helpTerms.length === 0;
-                let textHeader ="";
-                if(noHelpTerms){
-                    textHeader = "I may not understand what you want help with, but here are a few options:";
-                }else if(helpTerms.length == 1){
+                // const noHelpTerms = helpTerms.length === 0;
+                let textHeader: string | undefined; 
+                if(helpTerms.length == 1){
                     const data = helpTerms[0];
                     switch(data.value){
                         case "wallet": textHeader = "To connect to wallet you can click \"Connect\" on the top right or select the option down below!"; break;
+                        case "trade": textHeader = "To make a trade you can click on swap on the top navigation or select the option down below!"; break;
+                        case "deposit": textHeader = "To make a deposit you must have a wallet, click down below if you are connected!"; break;
                         default: break;
                     }
-                }else{
-                    textHeader = "Click on one of the options...";
-                    helpTerms.push(...["wallet"].map(e=>({ 
+                }else if(helpTerms.length > 1){
+                    textHeader = "Click on one of the options..."; 
+                }
+                if(!textHeader){
+                    textHeader = "I may not understand what you want help with, but here are a few options:";
+                    helpTerms.push(...["wallet", "deposit", "trade"].map(e=>{
+                        return { 
                             value: e,
                             name: "help_term",
                             confidence: 1,
-                        })
-                    ))
+                        }
+                    }))
                 }
                 return {
-                    text: textHeader,
+                    text: textHeader!,
                     type: "options",
                     options: helpTerms.map(e=> {
                         let text = "";
                         switch(e.value){
-                            case "wallet": text = "Connect with wallet"; break;
+                            case "wallet": text = "Connect to wallet"; break;
+                            case "deposit": text = "Deposit to wallet"; break;
+                            case "trade": text = "Swap tokens"; break;
+                            case "extract": text = "Extract from wallet"; break;
                             default: break;
                         }
                         return {
@@ -151,20 +157,41 @@ export const translateToMessage = async(data: MessageSuccess, chains: Array<Chai
                     return "A coin could not be found please try other coins!";
                 }
             }
-            case "extract": return "";
-            case "keyword_info": return "";
-            case "my_transactions": return "";
-            case "my_wallet": 
-                return "";
-            case "trending_coins":
-                return "";
-            default: 
-                return "I can't understand your question";
+            case "keyword_info": {
+                const message: Array<string> = [];
+                for(const el of data.entities){
+                    switch(el.value){
+                        case "OTON": ""; 
+                    }
+                }
+                return message.join("\n\n");
+            }
+            case "my_transactions": return {
+                text: account ? "Here is the list of your transactions: " : "You must connect first to see your transactions",
+                type: account ? "my_transactions" : "options",
+                options: account ? undefined : [{
+                    id: uuid(),
+                    action: "wallet",
+                    selected: false,
+                    text: "Connect to wallet"
+                }]
+            };
+            case "trending_coins": return {
+                text: "Here is the list with the most trenting coins: ",
+                type: "trending_coins",
+            };
+            default: return "I can't understand your question";
         }
     } 
-    return ttm().then(res=>{
-        if(typeof res === 'object') return res as FullMessage;
-        return {text: res as string, type: "text"};
+    return ttm().then(e=>{
+        let res: FullMessage;
+        if(typeof e === 'string'){
+            res = {text: e as string, type: "text"}
+        }else{
+            res = e as FullMessage;
+        } 
+        console.log("resTTM", res);
+        return res;
     });
 }
 const resForCoins = (type: string, tokensFrom: SearchTokensWebQuery, tokensTo?: SearchTokensWebQuery, recommendedChain?: Chain): FullMessage => {

@@ -14,6 +14,7 @@ const Row = styled(Box)<{
   border?: string
   borderRadius?: string
   gap?: Gap | string
+  wrappable? : boolean
 }>`
   width: ${({ width }) => width ?? '100%'};
   display: flex;
@@ -24,6 +25,7 @@ const Row = styled(Box)<{
   border: ${({ border }) => border};
   border-radius: ${({ borderRadius }) => borderRadius};
   gap: ${({ gap, theme }) => gap && (theme.grids[gap as Gap] || gap)};
+  flex-wrap: ${({wrappable}) => wrappable ? "wrap": "nowrap"}
 `
 
 export const RowBetween = styled(Row)`

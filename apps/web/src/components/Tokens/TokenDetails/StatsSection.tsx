@@ -16,18 +16,20 @@ import { TokenSortMethod } from '../state'
 export const StatWrapper = styled.div`
   color: ${({ theme }) => theme.neutral2};
   font-size: 14px;
-  min-width: 121px;
   flex: 1;
   padding-top: 24px;
   padding-bottom: 0px;
 
-  @media screen and (max-width: ${({ theme }) => theme.breakpoint.sm}px) {
-    min-width: 168px;
-  }
 `
 const TokenStatsSection = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+
+  @media screen and (max-width: ${({ theme }) => theme.breakpoint.lg}px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 `
 export const StatPair = styled.div`
   display: flex;
@@ -110,45 +112,41 @@ export default function StatsSection(props: StatsSectionProps) {
           <Trans>Stats</Trans>
         </Header>
         <TokenStatsSection>
-          <StatPair>
-            <Stat
-              dataCy="tvl"
-              value={TVL}
-              description={
-                <Trans>
-                  Total value locked (TVL) is the aggregate amount of the asset available across all Uniswap v3
-                  liquidity pools.
-                </Trans>
-              }
-              title={<Trans>TVL</Trans>}
-            />
-            <Stat
-              dataCy="market-cap"
-              value={marketCap}
-              description={
-                <Trans>Market capitalization is the total market value of an asset&apos;s circulating supply.</Trans>
-              }
-              title={<Trans>Market cap</Trans>}
-            />
-          </StatPair>
-          <StatPair>
-            <Stat
-              dataCy="fdv"
-              value={FDV}
-              description={HEADER_DESCRIPTIONS[TokenSortMethod.FULLY_DILUTED_VALUATION]}
-              title={<Trans>FDV</Trans>}
-            />
-            <Stat
-              dataCy="volume-24h"
-              value={volume24H}
-              description={
-                <Trans>
-                  1 day volume is the amount of the asset that has been traded on Oton v3 during the past 24 hours.
-                </Trans>
-              }
-              title={<Trans>1 day volume</Trans>}
-            />
-          </StatPair>
+          <Stat
+            dataCy="tvl"
+            value={TVL}
+            description={
+              <Trans>
+                Total value locked (TVL) is the aggregate amount of the asset available across all Uniswap v3
+                liquidity pools.
+              </Trans>
+            }
+            title={<Trans>TVL</Trans>}
+          />
+          <Stat
+            dataCy="market-cap"
+            value={marketCap}
+            description={
+              <Trans>Market capitalization is the total market value of an asset&apos;s circulating supply.</Trans>
+            }
+            title={<Trans>Market cap</Trans>}
+          />
+          <Stat
+            dataCy="fdv"
+            value={FDV}
+            description={HEADER_DESCRIPTIONS[TokenSortMethod.FULLY_DILUTED_VALUATION]}
+            title={<Trans>FDV</Trans>}
+          />
+          <Stat
+            dataCy="volume-24h"
+            value={volume24H}
+            description={
+              <Trans>
+                1 day volume is the amount of the asset that has been traded on Oton v3 during the past 24 hours.
+              </Trans>
+            }
+            title={<Trans>1 day volume</Trans>}
+          />
         </TokenStatsSection>
       </StatsWrapper>
     )

@@ -21,6 +21,11 @@ import TokenDetailsPage from 'pages/TokenDetails';
 import { MySwap, Swap } from 'pages/Swap';
 import Row from 'components/Row';
 import { useAccountDrawer } from 'components/AccountDrawer/MiniPortfolio/hooks';
+import { InterfaceEventName } from '@uniswap/analytics-events';
+import { sendAnalyticsEvent } from 'analytics';
+import { useOpenModal } from 'state/application/hooks';
+import { ApplicationModal } from 'state/application/reducer';
+import { ActivityTab } from 'components/AccountDrawer/MiniPortfolio/Activity';
 
 
 
@@ -112,7 +117,6 @@ const ButtonActionSecondary = styled(ButtonSecondary)`
 const SectionHeader = styled.div`
   display: flex;
   justify-content: center;
-  padding: 5px;
 `;
 
 
@@ -129,11 +133,22 @@ function ChatSection() {
   const histories = useAppSelector((state) => state.chatbot.histories);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  const openFiatOnrampModal = useOpenModal(ApplicationModal.FIAT_ONRAMP)
+  const openFoRModalWithAnalytics = useCallback(() => {
+    toggleAccountDrawer()
+    sendAnalyticsEvent(InterfaceEventName.FIAT_ONRAMP_WIDGET_OPENED)
+    openFiatOnrampModal()
+  }, [openFiatOnrampModal, toggleAccountDrawer])
+
+  const { account } = useWeb3React()
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [chatId, histories[chatId ?? ""]?.chats.length])
+
+
 
   const requestSubmit = useCallback((message: string, historyId?: string)=>{
     const botCid = uuid();
@@ -164,7 +179,7 @@ function ChatSection() {
           }])
         );
       }else if(res.success){
-        fullMessage = await translateToMessage(res.success, Object.values(Chain), chain);
+        fullMessage = await translateToMessage(res.success, Object.values(Chain), chain, account);
         fullMessage.status = "completed";
         console.log("fullMessageci", fullMessage)
         dispatch(
@@ -328,22 +343,28 @@ function ChatSection() {
               }
             </ActionContainer>
             }
-            
+            { item.type == "trending_coins" && 
+              (<div>Trending coins</div>)
+            }
+            { item.type == "my_transactions" && account && 
+              (<ActivityTab account={account}/>)
+            }
             { item.type == "coin_details" && item.typeData && 
               (<TokenDetailsPage isMini={true} chainNameImport={getValidUrl(item.typeData?.chain)} tokenAddressImport={item.typeData?.data?.address}/>) 
             }  
             { item.type == "trade_details" && item.typeData &&
               (<MySwap chainId={item.typeData?.chain} initialInputAddressId={item.typeData?.data?.from.address} initialOutputAddressId={item.typeData?.data?.to.address}/>)
             }
-            { item.type == "options" && item.options &&
-              (<Row gap="10px" > 
+            { item.options &&
+              (<Row wrappable={true} gap="10px" > 
                 {
-                  item.options.map((option,index) => {
+                  item.options.map((option, index) => {
                     let action: (()=>void) | undefined ;
                     switch(option.action){
-                      case "wallet": action = () => {
-                        toggleAccountDrawer();
-                      }
+                      case "wallet": action = () => toggleAccountDrawer(); break;
+                      case "deposit": action = () => openFoRModalWithAnalytics(); break;
+                      case "deposit": action = () => openFoRModalWithAnalytics(); break;
+                      case "deposit": action = () => openFoRModalWithAnalytics(); break;
                     }
                     const onClick = ()=>{
                       if(action){
@@ -364,7 +385,7 @@ function ChatSection() {
         </Chatbox>
       </>
     );
-  }, [chats, chatId, histories]);
+  }, [chats, chatId, histories, account]);
 
   const chatItems = useCallback(()=>{
     let chatItems: Array<string> = [];
@@ -382,7 +403,7 @@ function ChatSection() {
       }
     }
     return Object.entries(res).map((e) => renderItem(e[1], e[0]));
-  },[chats, chatId, histories]); 
+  },[chats, chatId, histories, account]); 
 
   return (
     <Section>

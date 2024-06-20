@@ -44,33 +44,33 @@ const initialState: ChatbotState = {
       renaming: false,
       chats:  ["1"]
     },
-    "11110000-0000-0000-0000-000011110000": {
-      id: "11110000-0000-0000-0000-000011110000",
-      name: "Buy Crypto",
-      tempName: "",
-      timestamp: 1714990242000,
-      hover: false,
-      renaming: false,
-      chats: ["1"]
-    },
-    "22220000-0000-0000-0000-000022220000": {
-      id: "22220000-0000-0000-0000-000022220000",
-      name: "What is OTON",
-      tempName: "",
-      timestamp: 1713607842000,
-      hover: false,
-      renaming: false,
-      chats: ["1"]
-    },
-    "33330000-0000-0000-0000-000033330000": {
-      id: "33330000-0000-0000-0000-000033330000",
-      name: "Connect wallet",
-      tempName: "",
-      timestamp: 1716199842000,
-      hover: false,
-      renaming: false,
-      chats: ["1"]
-    },
+    // "11110000-0000-0000-0000-000011110000": {
+    //   id: "11110000-0000-0000-0000-000011110000",
+    //   name: "Buy Crypto",
+    //   tempName: "",
+    //   timestamp: 1714990242000,
+    //   hover: false,
+    //   renaming: false,
+    //   chats: ["1"]
+    // },
+    // "22220000-0000-0000-0000-000022220000": {
+    //   id: "22220000-0000-0000-0000-000022220000",
+    //   name: "What is OTON",
+    //   tempName: "",
+    //   timestamp: 1713607842000,
+    //   hover: false,
+    //   renaming: false,
+    //   chats: ["1"]
+    // },
+    // "33330000-0000-0000-0000-000033330000": {
+    //   id: "33330000-0000-0000-0000-000033330000",
+    //   name: "Connect wallet",
+    //   tempName: "",
+    //   timestamp: 1716199842000,
+    //   hover: false,
+    //   renaming: false,
+    //   chats: ["1"]
+    // },
   },
   chats: {
     "1" : {
@@ -83,40 +83,40 @@ const initialState: ChatbotState = {
       editing: false,
       status: "completed",
     },
-    "2": {
-      id: "2",
-      text: "I'd like to know ....",
-      tempText: "",
-      type: "text",
-      isChatbotText: false,
-      hover: false,
-      editing: false,
-      status: "completed",
-    },
-    "3":{
-      id: "3",
-      text: "Hi i can help you with that",
-      tempText: "",
-      type: "options",
-      options: [
-        {id: "1", text: "Go to main", action: "/", selected: false},
-        {id: "2", text: "Go to explore", action: "/explore", selected: false},
-      ],
-      isChatbotText: true,
-      hover: false,
-      editing: false,
-      status: "completed",
-    },
-    "4":{
-      id: "4",
-      text: "4",
-      tempText: "",
-      isChatbotText: true,
-      hover: false,
-      type: "text",
-      editing: false,
-      status: "completed",
-    },
+    // "2": {
+    //   id: "2",
+    //   text: "I'd like to know ....",
+    //   tempText: "",
+    //   type: "text",
+    //   isChatbotText: false,
+    //   hover: false,
+    //   editing: false,
+    //   status: "completed",
+    // },
+    // "3":{
+    //   id: "3",
+    //   text: "Hi i can help you with that",
+    //   tempText: "",
+    //   type: "options",
+    //   options: [
+    //     {id: "1", text: "Go to main", action: "/", selected: false},
+    //     {id: "2", text: "Go to explore", action: "/explore", selected: false},
+    //   ],
+    //   isChatbotText: true,
+    //   hover: false,
+    //   editing: false,
+    //   status: "completed",
+    // },
+    // "4":{
+    //   id: "4",
+    //   text: "4",
+    //   tempText: "",
+    //   isChatbotText: true,
+    //   hover: false,
+    //   type: "text",
+    //   editing: false,
+    //   status: "completed",
+    // },
   },
 }
 

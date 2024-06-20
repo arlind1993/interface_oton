@@ -59,79 +59,79 @@ export interface MessageSuccess{
 
 export const witBotSendMessage = async (message: string): Promise<ResponseWit> => {
   console.log("send",message);
-  if(1 !== 1){
-    return new Promise((resolve: (value: ResponseWit)=> void) => {
-      setTimeout(()=>{
-        resolve({
-          success: {
-            entities: [
-              {
-                name: "exchange_coin",
-                confidence: 0.9,
-                value: "Bitcoin",
-              },{
-                name: "exchange_coin",
-                confidence: 0.9,
-                value: "Etherium",
-              },
-            ],
-            intent: {
-              confidence: 0.9,
-              value: "exchange_coins"
-            }
-          }
-        })
-      },500);
-      });
-    } else if(1!=1){
-      return new Promise((resolve: (value: ResponseWit)=> void) => {
-        setTimeout(()=>{
-          resolve({
-            success: {
-              entities: [
-                {
-                  name: "help_term",
-                  confidence: 0.9,
-                  value: "wallet",
-                },{
-                  name: "exchange_coin",
-                  confidence: 0.9,
-                  value: "Etherium",
-                },
-              ],
-              intent: {
-                confidence: 0.9,
-                value: "help"
-              }
-            }
-          })
-        },500);
-      });
-    }else if(2==2){
-      return new Promise((resolve: (value: ResponseWit)=> void) => {
-        setTimeout(()=>{
-          resolve({
-            success: {
-              entities: [
-                {
-                  name: "crypto_coin",
-                  confidence: 0.9,
-                  value: "Bit",
-                },{
-                  name: "exchange_coin",
-                  confidence: 0.9,
-                  value: "Etherium",
-                },
-              ],
-              intent: {
-                confidence: 0.9,
-                value: "coin_info"
-              }
-            }
-          })
-        },500);
-      });
-    }
+  // if(1 === 1){
+  //   return new Promise((resolve: (value: ResponseWit)=> void) => {
+  //     setTimeout(()=>{
+  //       resolve({
+  //         success: {
+  //           entities: [
+  //             {
+  //               name: "exchange_coin",
+  //               confidence: 0.9,
+  //               value: "Bitcoin",
+  //             },{
+  //               name: "exchange_coin",
+  //               confidence: 0.9,
+  //               value: "Etherium",
+  //             },
+  //           ],
+  //           intent: {
+  //             confidence: 0.9,
+  //             value: "exchange_coins"
+  //           }
+  //         }
+  //       })
+  //     },500);
+  //     });
+  //   } else if(1==1){
+  //     return new Promise((resolve: (value: ResponseWit)=> void) => {
+  //       setTimeout(()=>{
+  //         resolve({
+  //           success: {
+  //             entities: [
+  //               // {
+  //               //   name: "help_term",
+  //               //   confidence: 0.9,
+  //               //   value: "wallet",
+  //               // },{
+  //               //   name: "exchange_coin",
+  //               //   confidence: 0.9,
+  //               //   value: "Etherium",
+  //               // },
+  //             ],
+  //             intent: {
+  //               confidence: 0.9,
+  //               value: "my_transactions"
+  //             }
+  //           }
+  //         })
+  //       },500);
+  //     });
+  //   }else if(2==2){
+  //     return new Promise((resolve: (value: ResponseWit)=> void) => {
+  //       setTimeout(()=>{
+  //         resolve({
+  //           success: {
+  //             entities: [
+  //               {
+  //                 name: "crypto_coin",
+  //                 confidence: 0.9,
+  //                 value: "Bit",
+  //               },{
+  //                 name: "exchange_coin",
+  //                 confidence: 0.9,
+  //                 value: "Etherium",
+  //               },
+  //             ],
+  //             intent: {
+  //               confidence: 0.9,
+  //               value: "coin_info"
+  //             }
+  //           }
+  //         })
+  //       },500);
+  //     });
+  //   }
   try{
     const vId = 20240603;
     const url = `https://api.wit.ai/message?v=${vId}&q=${message}`
@@ -167,14 +167,19 @@ export const witBotSendMessage = async (message: string): Promise<ResponseWit> =
         })  
       });
     }
-
+    console.log({
+      success: successResponse
+    });
     return {
       success: successResponse
-    }
+    };
   }catch(e){
+    console.log({
+      error: e
+    });
     return {
       error: e
-    }
+    };
   }
 }
 
@@ -228,7 +233,7 @@ export const getTokensFromSearchQuery = async(variables: SearchTokensWebQueryVar
         headers: {
             'Content-Type': 'application/json',
         },
-        // mode: "no-cors",
+        mode: "cors",
         body: JSON.stringify({ query, variables }),
     }).then(response => {
         if (!response.ok) {

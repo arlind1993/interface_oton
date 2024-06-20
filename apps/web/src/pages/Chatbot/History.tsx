@@ -82,6 +82,7 @@ const HistoryContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding-right: 5px;
 `;
 
 const TitleContainer = styled(InputContainer) <{
