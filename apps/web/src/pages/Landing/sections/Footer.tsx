@@ -101,10 +101,10 @@ export function Footer() {
           <Box direction="column" height="100%" gap="64px">
             <Box direction="column" gap="10px">
               <H3>© 2024</H3>
-              <H3>Uniswap Labs</H3>
+              <H3>Oton Team</H3>
             </Box>
             <HideWhenSmall>
-              <Socials />
+              {/* <Socials /> */}
             </HideWhenSmall>
           </Box>
           <RowToCol direction="row" height="100%" gap="16px">
@@ -149,7 +149,7 @@ export function Footer() {
             </Box>
           </RowToCol>
           <HideWhenLarge>
-            <Socials />
+            {/* <Socials /> */}
           </HideWhenLarge>
         </RowToCol>
       </Box>

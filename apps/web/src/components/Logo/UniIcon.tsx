@@ -63,6 +63,6 @@ export const AiIcon = ({ clickable, ...props }: SVGProps) => {
 
 const Container = styled.div<{ clickable?: boolean }>`
   position: relative;
-
+  line-height: 0;
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'auto')};
 `

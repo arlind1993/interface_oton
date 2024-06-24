@@ -127,11 +127,11 @@ export function Menu({ close }: { close: () => void }) {
               <Trans>Download Oton</Trans>
             </Text>
             <ThemedText.LabelSmall lineHeight="18px">
-              <Trans>Available on iOS and Android</Trans>
+              <Trans>Soon to be vailable on iOS and Android</Trans>
             </ThemedText.LabelSmall>
           </Column>
         </StyledRow>
-        <StyledSocials iconSize="25px" />
+        {/* <StyledSocials iconSize="25px" /> */}
       </Column>
     </Container>
   )

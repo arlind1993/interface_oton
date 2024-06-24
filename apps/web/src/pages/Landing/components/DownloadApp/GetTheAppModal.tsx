@@ -70,23 +70,12 @@ export function GetTheAppModal() {
         <ColumnCenter gap="xl">
           <ColumnCenter gap="sm">
             <ThemedText.H1Medium textAlign="center">
-              <Trans>Download the Uniswap app</Trans>
+              <Trans>Comming soon...</Trans>
             </ThemedText.H1Medium>
             <ThemedText.BodySecondary textAlign="center" maxWidth="400px">
-              <Trans>Scan the QR code with your phone to download the Uniswap app</Trans>
+              <Trans>Oton App will be available for everyone. Making things easier and user friendly. Wait for our announcement for any news on our social media platforms</Trans>
             </ThemedText.BodySecondary>
           </ColumnCenter>
-          <BadgeLink href="https://uniswapwallet.onelink.me/8q3y/m4i9qsez?af_qr=true">
-            <StyledQRCode src={walletAppPromoBannerQR} alt="App OneLink QR code" />
-          </BadgeLink>
-          <Row justify="center" gap="16px">
-            <BadgeLink href="https://apps.apple.com/us/app/uniswap-crypto-nft-wallet/id6443944476">
-              <AppStoreBadge />
-            </BadgeLink>
-            <BadgeLink href="https://play.google.com/store/apps/details?id=com.uniswap.mobile&pcampaignid=web_share">
-              <PlayStoreBadge />
-            </BadgeLink>
-          </Row>
         </ColumnCenter>
       </Wrapper>
     </StyledModal>
