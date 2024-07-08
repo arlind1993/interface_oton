@@ -122,6 +122,7 @@ interface ExpectedApplicationState {
   readonly fiatOnramp: { available: boolean; availabilityChecked: boolean }
   readonly openModal: ApplicationModal | null
   readonly popupList: PopupList
+  readonly openHistoryChatbot: boolean
   readonly suppressedPopups: PopupType[]
 }
 

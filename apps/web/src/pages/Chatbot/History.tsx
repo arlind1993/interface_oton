@@ -12,6 +12,8 @@ import { scrollbarStyle } from 'components/SearchModal/CurrencyList/index.css';
 import Row from 'components/Row';
 import { useScreenSize } from 'hooks/useScreenSize';
 import { Z_INDEX } from 'theme/zIndex';
+import { persistor } from 'state';
+import { setOpenHistoryChatbot } from 'state/application/reducer';
 
 
 const Section = styled.div`
@@ -130,7 +132,7 @@ export function timeAgo(inputTime: number) {// inputtime with ms
 
 function History({}) {
   const historyTabSize = 175;
-  const [isOpen ,setOpen] = useState<boolean>(true);
+  const isOpen = useAppSelector((state)=> state.application.openHistoryChatbot);
   const screen = useScreenSize();
 
   const refs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -289,7 +291,7 @@ function History({}) {
 
   return (
     <>
-      {isOpen && !screen.md && <CloseBackground size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(false)}/>}
+      {isOpen && !screen.md && <CloseBackground size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => dispatch(setOpenHistoryChatbot(false))}/>}
       <Section style={ isOpen && screen.md ? {minWidth: historyTabSize, maxWidth: historyTabSize} : {
         position: "fixed",
         zIndex: Z_INDEX.sticky - 10 ,
@@ -302,13 +304,13 @@ function History({}) {
       <Row justify="space-between" gap='5px'>
           {isOpen ? (
             <MouseoverTooltip text="Close History" placement='bottom' size={TooltipSize.Auto}>
-              <TopButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(!isOpen)}>
+              <TopButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => dispatch(setOpenHistoryChatbot(!isOpen))}>
                 <LeftArrow style={{width: 20, height: 20}}/>
               </TopButton>
             </MouseoverTooltip>
           ):(
             <MouseoverTooltip text="Open History" placement='bottom' size={TooltipSize.Auto}>
-              <TopButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => setOpen(!isOpen)}>  
+              <TopButton size={ButtonSize.medium} emphasis={ButtonEmphasis.medium} onClick={() => dispatch(setOpenHistoryChatbot(!isOpen))}>  
                 <RightArrow style={{width: 20, height: 20}}/>
               </TopButton>
             </MouseoverTooltip>

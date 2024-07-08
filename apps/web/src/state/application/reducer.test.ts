@@ -19,6 +19,7 @@ describe('application reducer', () => {
       openModal: null,
       popupList: [],
       suppressedPopups: [],
+      openHistoryChatbot: true
     })
   })
 

@@ -81,9 +81,9 @@ function UniswapXPreferenceLabel() {
         text={
           <>
             <Trans>When available, aggregates liquidity sources for better prices and gas free swaps.</Trans>{' '}
-            <ExternalLink href="https://support.uniswap.org/hc/en-us/articles/17515415311501">
+            {/* <ExternalLink href="https://support.uniswap.org/hc/en-us/articles/17515415311501">
               <InlineLink>Learn more</InlineLink>
-            </ExternalLink>
+            </ExternalLink> */}
           </>
         }
         placement="right"

@@ -54,6 +54,7 @@ export interface ApplicationState {
   readonly openModal: ApplicationModal | null
   readonly popupList: PopupList
   readonly suppressedPopups: PopupType[]
+  readonly openHistoryChatbot: boolean
 }
 
 const initialState: ApplicationState = {
@@ -62,6 +63,7 @@ const initialState: ApplicationState = {
   openModal: null,
   popupList: [],
   suppressedPopups: [],
+  openHistoryChatbot: true,
 }
 
 const applicationSlice = createSlice({
@@ -104,6 +106,9 @@ const applicationSlice = createSlice({
     removeSuppressedPopups(state, { payload: { popupTypes } }) {
       state.suppressedPopups = state.suppressedPopups.filter((type) => !popupTypes.includes(type))
     },
+    setOpenHistoryChatbot(state, {payload}){
+      state.openHistoryChatbot = payload
+    }
   },
 })
 
@@ -111,6 +116,7 @@ export const {
   updateChainId,
   setFiatOnrampAvailability,
   setOpenModal,
+  setOpenHistoryChatbot,
   addPopup,
   removePopup,
   addSuppressedPopups,
