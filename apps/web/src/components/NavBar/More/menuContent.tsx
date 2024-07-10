@@ -29,6 +29,7 @@ export const useMenuContent = (): MenuSection[] => {
       items: [
         { label: t('Blog'), href: 'https://blog.oton.ai' , internal: true},
         { label: t('Developers'), href: '/developers' , internal: true},
+        { label: t('Whitepaper'), href: '/whitepaper' , internal: true},
       ],
     },
     {

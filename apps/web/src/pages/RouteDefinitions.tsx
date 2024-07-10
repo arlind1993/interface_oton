@@ -24,6 +24,7 @@ const MigrateV2Pair = lazy(() => import('pages/MigrateV2/MigrateV2Pair'))
 const NotFound = lazy(() => import('pages/NotFound'))
 const Chatbot = lazy(() => import('pages/Chatbot/Chatbot'))
 const Pool = lazy(() => import('pages/Pool'))
+const Whitepaper = lazy(() => import('pages/Whitepaper'))
 const PositionPage = lazy(() => import('pages/Pool/PositionPage'))
 const PoolV2 = lazy(() => import('pages/Pool/v2'))
 const PoolDetails = lazy(() => import('pages/PoolDetails'))
@@ -110,6 +111,11 @@ export const routes: RouteDefinition[] = [
     path: '/chatbot/:chatId',
     getTitle: () => `Oton AI`,
     getElement: () => <Chatbot/>,
+  }),
+  createRouteDefinition({
+    path: '/whitepaper',
+    getTitle: () => `Whitepaper`,
+    getElement: () => <Whitepaper/>,
   }),
   createRouteDefinition({
     path: '/explore',

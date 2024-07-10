@@ -25,6 +25,7 @@ export const paths = [
   '/pools/v2',
   '/pools',
   '/pools/:tokenId',
+  '/whitepaper',
   '/add/v2',
   '/add',
   '/increase',

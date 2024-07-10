@@ -130,6 +130,8 @@ export const USDT_OPTIMISM = new Token(
   'USDT',
   'Tether USD'
 )
+
+export const ETH_Added = new Token(ChainId.MAINNET, '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 8, 'ETH', 'Etherium')
 export const WBTC = new Token(ChainId.MAINNET, '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', 8, 'WBTC', 'Wrapped BTC')
 export const WBTC_ARBITRUM_ONE = new Token(
   ChainId.ARBITRUM_ONE,

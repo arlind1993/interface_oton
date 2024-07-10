@@ -31,7 +31,7 @@ export const TableContainer = styled(Column)<{ $maxWidth?: number; $maxHeight?: 
   margin: 0px auto 24px auto;
 `
 const StickyStyles = css`
-  top: 73px;
+  top: 0px;
   position: sticky;
   position: -webkit-sticky;
   z-index: ${Z_INDEX.under_dropdown};

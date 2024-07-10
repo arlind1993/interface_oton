@@ -134,6 +134,9 @@ export function Footer() {
                 <StyledInternalLink to="/">
                   <Trans>Developers</Trans>
                 </StyledInternalLink>
+                <StyledInternalLink to="/whitepaper">
+                  <Trans>WhitePaper</Trans>
+                </StyledInternalLink>
               </Box>
               <Box direction="column" gap="10px">
                 <Body1>
