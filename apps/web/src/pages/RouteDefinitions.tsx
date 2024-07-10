@@ -83,7 +83,7 @@ export interface RouteDefinition {
 function createRouteDefinition(route: Partial<RouteDefinition>): RouteDefinition {
   return {
     getElement: () => null,
-    getTitle: () => 'Uniswap Interface',
+    getTitle: () => 'Oton',
     enabled: () => true,
     path: '/',
     nestedPaths: [],
@@ -97,7 +97,7 @@ const SwapTitle = t`Buy, sell & trade Ethereum and other top tokens on Oton`
 export const routes: RouteDefinition[] = [
   createRouteDefinition({
     path: '/',
-    getTitle: () => t`Uniswap | Trade crypto & NFTs safely on the top DeFi exchange`,
+    getTitle: () => t`Oton | Trade crypto & NFTs safely on the top DeFi exchange`,
     getElement: (args) => {
       return args.browserRouterEnabled && args.hash ? <Navigate to={args.hash.replace('#', '')} replace /> : <Landing />
     },
@@ -255,12 +255,12 @@ export const routes: RouteDefinition[] = [
   createRouteDefinition({
     path: '/migrate/v2',
     getElement: () => <MigrateV2 />,
-    getTitle: () => t`Migrate v2 pool liquidity to Uniswap v3`,
+    getTitle: () => t`Migrate v2 pool liquidity`,
   }),
   createRouteDefinition({
     path: '/migrate/v2/:address',
     getElement: () => <MigrateV2Pair />,
-    getTitle: () => t`Migrate v2 pool liquidity to Uniswap v3`,
+    getTitle: () => t`Migrate v2 pool liquidity`,
   }),
 
   createRouteDefinition({
