@@ -630,7 +630,7 @@ interface Resources {
     },
     "notifications": {
       "scantastic": {
-        "subtitle": "Continue on Oton Extension",
+        "subtitle": "Continue on Uniswap Extension",
         "title": "Success"
       }
     },
@@ -1011,7 +1011,7 @@ interface Resources {
         "blocked": {
           "default": "This wallet is blocked",
           "modal": {
-            "message": "This address is blocked on Oton Wallet because it is associated with one or more blocked activities. If you believe this is an error, please email compliance@uniswap.org.",
+            "message": "This address is blocked on Uniswap Wallet because it is associated with one or more blocked activities. If you believe this is an error, please email compliance@uniswap.org.",
             "title": "Blocked address"
           },
           "recipient": "Recipient wallet is blocked"
@@ -1477,7 +1477,7 @@ interface Resources {
         },
         "strong": {
           "header": "Warning",
-          "message": "This token isn’t traded on leading U.S. centralized exchanges or frequently swapped on Oton. Always conduct your own research before trading."
+          "message": "This token isn’t traded on leading U.S. centralized exchanges or frequently swapped on Uniswap. Always conduct your own research before trading."
         }
       },
       "selector": {

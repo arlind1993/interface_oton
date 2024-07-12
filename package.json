@@ -120,11 +120,13 @@
     "wallet": "yarn workspace wallet",
     "web": "yarn workspace @uniswap/interface",
     "uniswap": "yarn workspace uniswap",
-    "utilities": "yarn workspace utilities"
+    "utilities": "yarn workspace utilities",
+    "backend": "yarn workspace backend"
   },
   "workspaces": [
     "apps/*",
     "packages/*",
-    "config/*"
+    "config/*",
+    "backend/*"
   ]
 }

@@ -13,6 +13,7 @@ import useAccountRiskCheck from 'hooks/useAccountRiskCheck'
 import Bag from 'nft/components/bag/Bag'
 import TransactionCompleteModal from 'nft/components/collection/TransactionCompleteModal'
 import { GetTheAppModal } from 'pages/Landing/components/DownloadApp/GetTheAppModal'
+import { OtonWalletModal } from 'pages/Landing/components/OtonWallet/OtonWalletModal'
 import { useModalIsOpen, useToggleModal } from 'state/application/hooks'
 import { ApplicationModal } from 'state/application/reducer'
 import { isBetaEnv, isDevEnv } from 'uniswap/src/utils/env'
@@ -40,6 +41,7 @@ export default function TopLevelModals() {
       <FiatOnrampModal />
       <UkDisclaimerModal />
       <GetTheAppModal />
+      <OtonWalletModal/>
       <PrivacyPolicyModal />
       <FeatureFlagModal />
       {shouldShowDevFlags && <DevFlagsBox />}

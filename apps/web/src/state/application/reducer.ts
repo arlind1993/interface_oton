@@ -44,6 +44,7 @@ export enum ApplicationModal {
   VOTE,
   UK_DISCLAIMER,
   GET_THE_APP,
+  OTON_WALLET_SIGN_IN
 }
 
 export type PopupList = Array<{ key: string; show: boolean; content: PopupContent; removeAfterMs: number | null }>

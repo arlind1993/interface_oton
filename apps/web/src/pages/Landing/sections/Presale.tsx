@@ -1,6 +1,7 @@
 import Row from 'components/Row'
 import { t, Trans } from 'i18n'
 import { useCallback, useMemo } from 'react'
+import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { StatCard } from '../components/StatCard'
 import { motion } from 'framer-motion'
@@ -20,6 +21,8 @@ import { Table } from 'components/Table'
 import { ColumnDef } from '@tanstack/react-table'
 import { timeAgo } from '../../Chatbot/History';
 import { Amount } from '../../../../../../dist/out-tsc/packages/uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks';
+import { useModalIsOpen } from 'state/application/hooks'
+import { ApplicationModal, setOpenModal } from 'state/application/reducer'
 
 const Container = styled.div`
   width: 100%;
@@ -60,6 +63,8 @@ const Description = styled.div`
     color: ${({ theme }) => theme.neutral2};
     font-weight: 485;
     font-size: 0.85em;
+    font-height: 0.85em;
+    line-height: 1.5em;
     margin-bottom: 10px;
     max-width: 700px;
 `
@@ -112,17 +117,17 @@ const TokenPrice = styled.div`
 
 
 const TableContainer = styled.div`
-  max-width: 800px;  // Set max width for the table
-  min-width: 400px;  // Set min width for the table
+  max-width: 800px;
+  min-width: 400px;
   margin-top: 20px;
   margin-bottom: 20px;
   overflow: auto;
 `;
 
-const CellContainer = styled.div`
+const CellContainer = styled.div<{minWidth?: number, maxWidth?: number}>`
   padding: 8px;
-  min-width: 150px; /* Minimum width for each column */
-  max-width: 300px; /* Maximum width for each column */
+  min-width: ${(props) => props.minWidth ?? 150}px;
+  max-width: ${(props) => props.maxWidth ?? 300}px;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
@@ -169,11 +174,16 @@ const TokenTicker = styled.div`
 
 
 function Exchange({ from, to, toConversionToUSDT}: { from: Token; to: Token, toConversionToUSDT: number }) {
+    
+
+    const modal = ApplicationModal.OTON_WALLET_SIGN_IN;
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const isOpen = useModalIsOpen(modal)
+    const { formatFiatPrice } = useFormatter()
+    
     const chainId = from.chainId
     const address = from.address
-    const navigate = useNavigate();
-    
-    const { formatFiatPrice } = useFormatter()
     
     const currency = useCurrency(address, chainId)
     const tokenPromoQuery = useTokenPromoQuery({
@@ -183,17 +193,20 @@ function Exchange({ from, to, toConversionToUSDT}: { from: Token; to: Token, toC
       },
     })
     const price = tokenPromoQuery.data?.token?.market?.price?.value ?? 0
-    const handleClick = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+            console.log("lol" + isOpen);
             e.stopPropagation()
-            navigate(
-            getTokenDetailsURL({
-                address: address === 'ETH' ? NATIVE_CHAIN_ID : address,
-                chain: chainIdToBackendName(chainId),
-            })
-            )
+            // navigate(
+            //     getTokenDetailsURL({
+            //         address: address === 'ETH' ? NATIVE_CHAIN_ID : address,
+            //         chain: chainIdToBackendName(chainId),
+            //     })
+            // )
+            if(!isOpen){
+                dispatch(setOpenModal(modal));
+            }
         },
-        [address, chainId, navigate]
+        [address, ,chainId, navigate, isOpen]
     )
 
     const priceFormated = formatFiatPrice({
@@ -285,17 +298,17 @@ export function Presale() {
 
     const columns: ColumnDef<{ profile: string; name?: string; count: number; lastTime: number }>[] = [
         {
-            header: () => <NumberContainer>#</NumberContainer>,
+            header: () => <CellContainer minWidth={50} maxWidth={50}>#</CellContainer>,
             accessorKey: 'index',
-            cell: ({ row }) => <NumberContainer>{row.index + 1}</NumberContainer>,
+            cell: ({ row }) => <CellContainer minWidth={50} maxWidth={50}>{row.index + 1}</CellContainer>,
         },
         {
-            header:  () => <CellContainer>Profile</CellContainer>,
+            header:  () => <CellContainer minWidth={50} maxWidth={60}>Profile</CellContainer>,
             accessorKey: 'profile',
-            cell: ({ getValue }) => <CellContainer><img src={getValue<string>()} alt="Profile" width="50" height="50" /></CellContainer>
+            cell: ({ getValue }) => <CellContainer minWidth={50} maxWidth={60}><img src={getValue<string>()} alt="Profile" width="40" height="40" /></CellContainer>
         },
         {
-            header: () => <CellContainer>Name</CellContainer>,
+            header: () => <CellContainer>Address</CellContainer>,
             accessorKey: 'name',
             cell: ({ getValue }) => <CellContainer>{getValue<string>()??"Anonymous"}</CellContainer>,
         },
@@ -335,8 +348,8 @@ export function Presale() {
             Experience seamless, AI-powered trading with OTON's secure wallet, trend analysis, and versatile OTON coin. Join the revolution that democratizes crypto investments, making it accessible for everyone. Choose OTON for its cutting-edge AI insights and user-friendly interface, empowering you to make informed decisions with ease. Be among the first 100 to sign up and receive free OTON coins – your gateway to a smarter crypto journey!
         </Description>
         {
-            from.map((data)=> {
-                return <Exchange from={data} to={to} toConversionToUSDT={toPriceInDollars}/>
+            from.map((data, index)=> {
+                return <Exchange key={""+index} from={data} to={to} toConversionToUSDT={toPriceInDollars}/>
             })
         }
         <Description>
