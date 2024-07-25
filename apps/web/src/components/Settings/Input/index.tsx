@@ -29,19 +29,16 @@ export const InputContainer = styled(Row)<{ error?: boolean }>`
   input {
     color: ${({ theme, error }) => (error ? theme.critical : theme.neutral1)};
   }
-  border: 1px solid ${({ theme, error }) => (error ? theme.critical : theme.surface2)};
-  ${({ theme, error }) =>
-    error
-      ? `
-        border: 1px solid ${theme.critical};
-        :focus-within {
-          border-color: ${theme.deprecated_accentFailureSoft};
-        }
-      `
-      : `
-        border: 1px solid ${theme.surface3};
-        :focus-within {
-          border-color: ${theme.accent2};
-        }
-      `}
+  border: 1px solid ${({ theme, error }) => (error ? theme.critical : theme.accent1)};
+  ${({ theme, error }) => error ? `
+    border: 1px solid ${theme.critical};
+    :focus-within {
+      border-color: ${theme.deprecated_accentFailureSoft};
+    }
+  ` : `
+    border: 1px solid ${theme.accent1};
+    :focus-within {
+      border-color: ${theme.accent1};
+    }
+  `}
 `

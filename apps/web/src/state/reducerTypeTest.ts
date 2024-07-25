@@ -29,6 +29,8 @@ import { SerializedPair, SerializedToken, SlippageTolerance } from './user/types
 import { WalletState } from './wallets/reducer'
 import { Wallet } from './wallets/types'
 import { ChatbotState } from './chatbot/reducer'
+import { OtonWalletPersistState } from './otonWalletPersist/reducer'
+import { OtonWalletState } from './otonWallet/reducer'
 
 /**
  * WARNING:
@@ -61,6 +63,8 @@ type ExpectedAppState = CombinedState<{
   burn: BurnState
   burnV3: BurnV3State
   chatbot: ChatbotState
+  otonWallet: OtonWalletState
+  otonWalletPersist: OtonWalletPersistState
   multicall: ReturnType<typeof multicall.reducer>
   logs: LogsState
   [routingApi.reducerPath]: ReturnType<typeof routingApi.reducer>

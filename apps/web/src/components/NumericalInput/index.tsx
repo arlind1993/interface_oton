@@ -50,7 +50,7 @@ function localeUsesComma(locale: SupportedLocale): boolean {
 
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." characters via in a non-capturing group
 
-interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, 'ref' | 'onChange' | 'as'> {
+export interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, 'ref' | 'onChange' | 'as'> {
   value: string | number
   onUserInput: (input: string) => void
   error?: boolean
@@ -65,9 +65,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const { formatterLocale } = useFormatterLocales()
 
     const enforcer = (nextUserInput: string) => {
-      if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
+      if (nextUserInput !== '' || (true && inputRegex.test(escapeRegExp(nextUserInput)))) {
         const decimalGroups = nextUserInput.split('.')
         if (maxDecimals && decimalGroups.length > 1 && decimalGroups[1].length > maxDecimals) {
+
           return
         }
 
@@ -88,18 +89,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         value={prependSymbol && value ? prependSymbol + valueFormattedWithLocale : valueFormattedWithLocale}
         onChange={(event) => {
+          const value = event.target.value || ""
           if (prependSymbol) {
-            const value = event.target.value
 
             // cut off prepended symbol
-            const formattedValue = value.toString().includes(prependSymbol)
-              ? value.toString().slice(prependSymbol.length, value.toString().length + 1)
+            const formattedValue = value.includes(prependSymbol)
+              ? value.slice(prependSymbol.length, value.length + 1)
               : value
 
             // replace commas with periods, because uniswap exclusively uses period as the decimal separator
             enforcer(formattedValue.replace(/,/g, '.'))
           } else {
-            enforcer(event.target.value.replace(/,/g, '.'))
+            enforcer(value.replace(/,/g, '.'))
           }
         }}
         // universal input options

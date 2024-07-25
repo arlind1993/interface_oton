@@ -125,13 +125,13 @@ const walletsSlice = createSlice({
   initialState,
   reducers: {
     addHistoryItem(state, { payload: {items} }: PayloadAction<{items: Array<HistoryItem>}>) {
-      // console.log("addHistoryItem", items);
+      console.log("addHistoryItem", items);
       for(const item of items){
         state.histories[item.id] = item
       }
     },
     addChatItem(state, { payload: {items, historyId} }: PayloadAction<{items: Array<ChatItem>, historyId?: string}>) {
-      // console.log("addChatItem", items);
+      console.log("addChatItem", items);
       for(const item of items){
         state.chats[item.id] = item
       }
@@ -143,7 +143,7 @@ const walletsSlice = createSlice({
       id: string,
       item: Partial<ChatItem>
     }>>) {
-      // console.log("updateChatItem", payload);
+      console.log("updateChatItem", payload);
       for(const {id, item} of payload){
         if(state.chats[id]){
           Object.assign(state.chats[id], item);

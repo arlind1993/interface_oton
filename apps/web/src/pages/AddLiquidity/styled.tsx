@@ -1,5 +1,5 @@
 import { AutoColumn } from 'components/Column'
-import { Input } from 'components/NumericalInput'
+import { Input, InputProps } from 'components/NumericalInput'
 import styled from 'styled-components'
 
 export const Wrapper = styled.div`

@@ -19,17 +19,21 @@ import transactions from './transactions/reducer'
 import user from './user/reducer'
 import wallets from './wallets/reducer'
 import chatbot from './chatbot/reducer'
+import otonWallet from './otonWallet/reducer'
+import otonWalletPersist from './otonWalletPersist/reducer'
 
 const persistedReducers = {
   user,
   transactions,
   signatures,
   chatbot,
+  otonWalletPersist,
   lists,
 }
 
 const appReducer = combineReducers({
   application,
+  otonWallet,
   wallets,
   mint,
   mintV3,

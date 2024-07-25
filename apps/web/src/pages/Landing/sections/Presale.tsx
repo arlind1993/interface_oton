@@ -1,7 +1,6 @@
 import Row from 'components/Row'
 import { t, Trans } from 'i18n'
 import { useCallback, useMemo } from 'react'
-import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
 import { StatCard } from '../components/StatCard'
 import { motion } from 'framer-motion'
@@ -23,6 +22,7 @@ import { timeAgo } from '../../Chatbot/History';
 import { Amount } from '../../../../../../dist/out-tsc/packages/uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks';
 import { useModalIsOpen } from 'state/application/hooks'
 import { ApplicationModal, setOpenModal } from 'state/application/reducer'
+import { useAppDispatch } from 'state/hooks'
 
 const Container = styled.div`
   width: 100%;
@@ -169,7 +169,7 @@ const TokenTicker = styled.div`
     line-height: 24px;
     font-style: normal;
     font-weight: 500;
-    color: #9B9B9B;
+    color: ${({theme})=> theme.neutral2};
 `
 
 
@@ -177,7 +177,7 @@ function Exchange({ from, to, toConversionToUSDT}: { from: Token; to: Token, toC
     
 
     const modal = ApplicationModal.OTON_WALLET_SIGN_IN;
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const isOpen = useModalIsOpen(modal)
     const { formatFiatPrice } = useFormatter()
@@ -262,7 +262,7 @@ export function Presale() {
         { 
             profile: "https://avatar.iran.liara.run/public",
             count: 14,   
-            lastTime: 343334332 
+            lastTime: 343334332122
         },   
         {
             profile: "https://avatar.iran.liara.run/public",

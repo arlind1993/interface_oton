@@ -1,4 +1,6 @@
 import { DialogContent, DialogOverlay } from '@reach/dialog'
+import { ScrollBarStyles } from 'components/Common'
+import { scrollbarStyle } from 'components/SearchModal/CurrencyList/index.css'
 import React from 'react'
 import { animated, easings, useSpring, useTransition } from 'react-spring'
 import { useGesture } from 'react-use-gesture'
@@ -26,6 +28,7 @@ const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{ $scrollOverlay?: boo
     justify-content: center;
 
     background-color: ${({ theme }) => theme.scrim};
+    ${ScrollBarStyles} 
   }
 `
 

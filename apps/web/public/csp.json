@@ -129,6 +129,7 @@
     "https://*.quiknode.pro",
     "https://*.infura.io",
     "https://api.wit.ai",
+    "http://localhost:5000",
     "wss://relay.walletconnect.com",
     "wss://relay.walletconnect.org",
     "wss://www.walletlink.org",
