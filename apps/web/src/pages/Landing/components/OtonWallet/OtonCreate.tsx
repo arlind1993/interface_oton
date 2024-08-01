@@ -335,7 +335,7 @@ export function OtonCreate() {
                             <CellContainer onClick={()=> {
                                 console.log(e);
                                 navigator.clipboard.writeText(e);
-                            }} id={"passphrase"+index}>
+                            }} key={"passphrase"+index}>
                                 {e}
                             </CellContainer>
                             )
