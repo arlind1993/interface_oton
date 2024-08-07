@@ -34,6 +34,11 @@ yarn-error.log*
 .turbo
 
 # .yarn files
+
+backend/.yarn/cache
+backend/.yarn/versions
+backend/.yarn/install-state.gz
+
 .yarn/cache
 .yarn/versions
 .yarn/install-state.gz
